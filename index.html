@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gaza Saltwater Wedge</title>
+<meta name="description" content="Interactive case study of seawater intrusion in Gaza's coastal aquifer, with evidence labelled as measured, modelled, reported or interpreted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Schibsted+Grotesk:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout concept: one reading column with wide, framed interactive figures. The cross-section simulator is the hero image. */
+:root{
+  --bg:#F2F6F5; --surface:#FFFFFF; --surface-2:#E3ECEB; --fg:#0D1E1D; --fg-muted:#3F5857; --line:#C3D3D2;
+  --accent:#E8710A; --accent-hover:#CF6200; --on-accent:#1A0E00; --accent-ink:#934400;
+  --fresh:#2FA3C2; --fresh-a:.62; --salt:#174A76; --sand:#E9DCB9; --clay:#A38E6C;
+  --on-fresh:#0D1E1D; --on-salt:#FFFFFF; --on-clay:#1F1708;
+  --ramp-lo:#D5EAF0; --ramp-hi:#0F3A63;
+  --good:#1B7448; --warn:#8F5300; --bad:#B3261E; --focus:#0B5CAD;
+  --font-head:"Schibsted Grotesk","Segoe UI",system-ui,sans-serif;
+  --font-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:80px;
+  --r-frame:20px; --pad-frame:8px; --seg-r:10px; --seg-pad:3px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1617; --surface:#122324; --surface-2:#1A3031; --fg:#EAF3F2; --fg-muted:#AEC4C3; --line:#2B4546;
+    --accent:#F59A33; --accent-hover:#FFB057; --on-accent:#1A0E00; --accent-ink:#FFB662;
+    --fresh:#66CBE3; --fresh-a:.8; --salt:#2A64A0; --sand:#4A4331; --clay:#6D5E45;
+    --on-fresh:#08181A; --on-clay:#F5ECD8;
+    --ramp-lo:#1B4152; --ramp-hi:#86CBF5;
+    --good:#52C58C; --warn:#F2B64A; --bad:#FF8478; --focus:#7CC4F0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1617; --surface:#122324; --surface-2:#1A3031; --fg:#EAF3F2; --fg-muted:#AEC4C3; --line:#2B4546;
+  --accent:#F59A33; --accent-hover:#FFB057; --on-accent:#1A0E00; --accent-ink:#FFB662;
+  --fresh:#66CBE3; --fresh-a:.8; --salt:#2A64A0; --sand:#4A4331; --clay:#6D5E45;
+  --on-fresh:#08181A; --on-clay:#F5ECD8;
+  --ramp-lo:#1B4152; --ramp-hi:#86CBF5;
+  --good:#52C58C; --warn:#F2B64A; --bad:#FF8478; --focus:#7CC4F0;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  background:var(--bg); color:var(--fg);
+  font-family:var(--font-body); font-size:18px; line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin-inline:auto}
+h1,h2,h3{font-family:var(--font-head); margin:0; letter-spacing:-0.015em; text-wrap:balance}
+h1{font-size:clamp(28px,4.3vw,48px); line-height:1.1; font-weight:800; max-width:30ch}
+h2{font-size:clamp(26px,3.6vw,38px); line-height:1.12; font-weight:700; max-width:32ch}
+h3{font-size:20px; line-height:1.25; font-weight:700}
+p{margin:0; text-wrap:pretty}
+a{color:var(--accent-ink); text-underline-offset:3px}
+a:hover{color:var(--fg)}
+:focus-visible{outline:3px solid var(--focus); outline-offset:3px; border-radius:4px}
+.lead{font-size:20px; color:var(--fg-muted); max-width:60ch}
+.small{font-size:15px; color:var(--fg-muted)}
+.num,output,.tnum{font-variant-numeric:tabular-nums}
+.eq{font-family:var(--font-mono); font-weight:500; font-size:19px; background:var(--surface-2); padding:var(--s3) var(--s4); border-radius:var(--seg-r); display:inline-block; max-width:100%; overflow-x:auto}
+
+/* header */
+.site{display:flex; flex-wrap:wrap; gap:var(--s3) var(--s5); align-items:center; justify-content:space-between; padding-block:var(--s4)}
+.brand{font-family:var(--font-head); font-weight:800; font-size:18px; letter-spacing:-0.01em; color:var(--fg); text-decoration:none}
+.site nav{display:flex; flex-wrap:wrap; gap:var(--s1) var(--s5); align-items:center}
+.site nav a{color:var(--fg-muted); text-decoration:none; font-weight:600; font-size:15px; padding:var(--s2) 0}
+.site nav a:hover{color:var(--fg); text-decoration:underline; text-underline-offset:5px}
+.icon-btn{display:inline-grid; place-items:center; width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--fg); cursor:pointer}
+.icon-btn:hover{background:var(--surface-2)}
+.icon{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none}
+[data-mode="dark"] .i-moon,[data-mode="light"] .i-sun{display:none}
+
+/* hero */
+.hero{padding-block:var(--s7) var(--s6); display:flex; flex-direction:column; gap:var(--s5)}
+.actions{display:flex; flex-wrap:wrap; gap:var(--s4) var(--s5); align-items:center}
+.btn{display:inline-flex; align-items:center; gap:var(--s2); min-height:52px; padding:0 var(--s5); border-radius:12px; background:var(--accent); color:var(--on-accent); font-family:var(--font-head); font-weight:700; font-size:18px; text-decoration:none; border:0; cursor:pointer}
+.btn:hover{background:var(--accent-hover); color:var(--on-accent)}
+.btn.quiet{background:var(--surface-2); color:var(--fg); min-height:44px; font-size:16px; padding:0 var(--s4); border-radius:10px}
+.btn.quiet:hover{background:var(--line); color:var(--fg)}
+.link-strong{font-weight:700; color:var(--fg)}
+
+/* frame: inner radius = outer radius minus padding */
+.frame{background:var(--surface-2); border-radius:var(--r-frame); padding:var(--pad-frame)}
+.frame>.inner{background:var(--surface); border-radius:calc(var(--r-frame) - var(--pad-frame)); overflow:hidden}
+.inner-pad{padding:var(--s5)}
+svg.fig{display:block; width:100%; height:auto}
+.controls{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--s5); padding:var(--s5)}
+.ctrl label,.ctrl .lbl{display:flex; justify-content:space-between; gap:var(--s3); font-weight:600; font-size:16px; margin-bottom:var(--s2)}
+.ctrl output{color:var(--accent-ink); font-weight:700}
+input[type=range]{width:100%; accent-color:var(--accent); height:40px; margin:0}
+fieldset{border:0; margin:0; padding:0; min-width:0}
+legend{padding:0; font-weight:600; font-size:16px; margin-bottom:var(--s2)}
+.seg{display:inline-flex; flex-wrap:wrap; gap:2px; padding:var(--seg-pad); background:var(--surface-2); border-radius:var(--seg-r)}
+.seg input{position:absolute; opacity:0; pointer-events:none}
+.seg label,.seg button{display:inline-flex; align-items:center; min-height:44px; padding:0 var(--s3); border-radius:calc(var(--seg-r) - var(--seg-pad)); font-size:15px; font-weight:600; cursor:pointer; color:var(--fg); background:transparent; border:0; font-family:inherit}
+.seg label:hover,.seg button:hover{background:var(--line)}
+.seg input:checked+span,.seg button[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.seg label{padding:0}
+.seg label span{display:inline-flex; align-items:center; min-height:44px; padding:0 var(--s4); border-radius:calc(var(--seg-r) - var(--seg-pad))}
+.seg input:focus-visible+span{outline:3px solid var(--focus); outline-offset:2px}
+.readouts{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s5); padding:var(--s5); margin:0; border-top:1px solid var(--line)}
+.readouts dt{font-size:14px; color:var(--fg-muted); font-weight:600}
+.readouts dd{margin:var(--s1) 0 0; font-family:var(--font-head); font-weight:700; font-size:24px; line-height:1.2; font-variant-numeric:tabular-nums}
+.readouts dd small{display:block; font-family:var(--font-body); font-weight:400; font-size:14px; color:var(--fg-muted); margin-top:2px}
+.state{display:inline-flex; align-items:center; gap:var(--s2)}
+.state::before{content:""; width:14px; height:14px; background:currentColor; flex:none}
+.s-good{color:var(--good)} .s-good::before{border-radius:50%}
+.s-warn{color:var(--warn)} .s-warn::before{clip-path:polygon(50% 0,100% 100%,0 100%)}
+.s-bad{color:var(--bad)} .s-bad::before{border-radius:2px}
+.fig-note{padding:0 var(--s5) var(--s5)}
+
+/* sections */
+.block{padding-block:var(--s8); display:flex; flex-direction:column; gap:var(--s6)}
+.block+.block{border-top:1px solid var(--line)}
+.block-head{display:flex; flex-direction:column; gap:var(--s3)}
+.cols{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:var(--s6); align-items:start}
+.cols.even{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cols.match{align-items:stretch}
+.figscroll{overflow-x:auto}
+@media (max-width:600px){.figscroll svg{min-width:720px}.figscroll.narrow svg{min-width:560px}}
+.stack{display:flex; flex-direction:column; gap:var(--s4)}
+.facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--s5) var(--s6); margin:0}
+.facts dt{font-weight:700; font-family:var(--font-head)}
+.facts dd{margin:var(--s1) 0 0; color:var(--fg-muted)}
+.callout{background:var(--surface); border:1px solid var(--line); border-radius:var(--seg-r); padding:var(--s4) var(--s5)}
+.callout strong{font-family:var(--font-head)}
+.stat{font-family:var(--font-head); font-weight:800; font-size:clamp(30px,4vw,44px); line-height:1; font-variant-numeric:tabular-nums}
+
+/* data slots, skeletons */
+.slot[data-state="loading"] .ok,.slot[data-state="loading"] .err{display:none}
+.slot[data-state="ready"] .sk,.slot[data-state="ready"] .err{display:none}
+.slot[data-state="error"] .sk,.slot[data-state="error"] .ok{display:none}
+.sk{display:flex; flex-direction:column; gap:var(--s3)}
+.sk span{display:block; height:22px; border-radius:6px; background:var(--surface-2); animation:pulse 1.4s ease-in-out infinite}
+.sk span.tall{height:220px; border-radius:var(--seg-r)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.err{display:flex; flex-direction:column; align-items:flex-start; gap:var(--s3); padding:var(--s5); background:var(--surface); border:1px solid var(--line); border-radius:var(--seg-r)}
+
+/* map + bars */
+.map-wrap{max-width:340px; width:100%}
+.region{stroke:var(--surface); stroke-width:2; cursor:pointer}
+.region.on{stroke:var(--accent); stroke-width:4}
+.map-txt{font-family:var(--font-body); font-size:13px; fill:var(--fg-muted); font-weight:600}
+.map-sel{font-family:var(--font-head); font-size:14px; font-weight:700; fill:var(--fg); paint-order:stroke; stroke:var(--bg); stroke-width:4px; stroke-linejoin:round}
+.rows{display:flex; flex-direction:column; gap:var(--s2)}
+.row{display:grid; grid-template-columns:110px 64px minmax(0,1fr); gap:var(--s3); align-items:center; width:100%; text-align:left; padding:var(--s3); border-radius:var(--seg-r); border:1px solid transparent; background:transparent; cursor:pointer; font:inherit; color:var(--fg)}
+.row:hover{background:var(--surface-2)}
+.row[aria-pressed="true"]{background:var(--surface); border-color:var(--line)}
+.row .rn{font-weight:700}
+.row .rv{font-variant-numeric:tabular-nums; text-align:right; font-weight:600}
+.track{position:relative; height:18px; background:var(--surface-2); border-radius:6px}
+.row[aria-pressed="true"] .track{background:var(--bg)}
+.fill{position:absolute; inset:0 auto 0 0; border-radius:6px}
+.mark{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--accent)}
+
+/* balance */
+.bars{display:flex; flex-direction:column; gap:var(--s5)}
+.bar-row .bl{display:flex; justify-content:space-between; gap:var(--s3); font-weight:600; margin-bottom:var(--s2)}
+.bar-row .bl span:last-child{font-variant-numeric:tabular-nums}
+.band{position:relative; height:30px; background:var(--surface-2); border-radius:8px}
+.band .solid,.band .range{position:absolute; top:0; bottom:0; border-radius:8px 0 0 8px}
+.band .range{border-radius:0 8px 8px 0; opacity:.45}
+.band.cap .solid{border-radius:8px}
+.band .tick{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--fg)}
+.c-fresh{background:var(--fresh)} .c-pump{background:var(--accent)}
+
+/* unfit */
+.group-title{font-family:var(--font-head); font-weight:700; font-size:16px; margin:var(--s5) 0 var(--s2)}
+.urow{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 70px; gap:var(--s2) var(--s4); align-items:center; padding:var(--s3) 0; border-top:1px solid var(--line)}
+.urow .what{font-weight:600}
+.urow .meta{font-size:14px; color:var(--fg-muted); grid-column:1/-1}
+.urow .uv{font-family:var(--font-head); font-weight:700; text-align:right; font-variant-numeric:tabular-nums}
+.urow .track{height:14px}
+.tag{display:inline-flex; align-items:center; gap:var(--s2); font-size:14px; font-weight:600; color:var(--fg)}
+.tag::before{content:""; width:10px; height:10px; background:currentColor; flex:none}
+.t-un::before{border-radius:1px}
+.t-peer::before{transform:rotate(45deg) scale(.85); border-radius:1px}
+.t-ngo::before{border-radius:50%}
+.t-local::before{clip-path:polygon(50% 0,100% 100%,0 100%)}
+.t-secondary::before{background:transparent; border:2px solid currentColor; border-radius:50%}
+
+/* war log */
+.log{display:flex; flex-direction:column}
+.log-item{display:grid; grid-template-columns:120px minmax(0,1fr); gap:var(--s4); padding:var(--s4) 0; border-top:1px solid var(--line)}
+.log-date{font-weight:700; font-variant-numeric:tabular-nums; color:var(--fg-muted)}
+.log-meta{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4); align-items:center; margin-bottom:var(--s1)}
+.log-item p{max-width:68ch}
+.log-item .src{font-size:15px; font-weight:600}
+
+/* salt */
+.salt-fig .src-shape{transition:none}
+.salt-fig[data-sel] .src-shape{opacity:.25}
+.salt-fig[data-sel="sea"] [data-s="sea"],.salt-fig[data-sel="east"] [data-s="east"],.salt-fig[data-sel="brine"] [data-s="brine"],.salt-fig[data-sel="human"] [data-s="human"]{opacity:1}
+.src-card dl{margin:0; display:grid; gap:var(--s3)}
+.src-card dt{font-size:14px; font-weight:600; color:var(--fg-muted)}
+.src-card dd{margin:2px 0 0}
+.view{display:flex; flex-direction:column; gap:var(--s3); padding:var(--s5); background:var(--surface); border:1px solid var(--line); border-radius:var(--seg-r)}
+
+/* quiz */
+.quiz{max-width:760px}
+.opt{display:flex; align-items:flex-start; gap:var(--s3); width:100%; text-align:left; font:inherit; color:var(--fg); background:var(--surface); border:1px solid var(--line); border-radius:var(--seg-r); padding:var(--s3) var(--s4); cursor:pointer; min-height:52px}
+.opt:hover:not(:disabled){background:var(--surface-2)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good); border-width:2px}
+.opt.wrong{border-color:var(--bad); border-width:2px}
+.opt .icon{margin-top:3px}
+.verdict{font-family:var(--font-head); font-weight:700}
+.progress{display:flex; justify-content:space-between; font-weight:600; font-size:15px; color:var(--fg-muted); font-variant-numeric:tabular-nums}
+
+/* refs, footer */
+.refs{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:var(--s2); font-size:16px; color:var(--fg-muted)}
+.refs a{color:var(--fg)}
+footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); display:flex; flex-direction:column; gap:var(--s3)}
+
+@media (max-width:820px){
+  .cols,.cols.even{grid-template-columns:minmax(0,1fr)}
+  .block{padding-block:var(--s7)}
+  .row{grid-template-columns:96px 56px minmax(0,1fr)}
+  .urow{grid-template-columns:minmax(0,1fr) 64px}
+  .urow .track{grid-column:1/-1; order:3}
+  .urow .meta{grid-column:1/-1}
+  .log-item{grid-template-columns:minmax(0,1fr); gap:var(--s1)}
+}
+.kind{display:inline-block; font-size:14px; font-weight:700; line-height:1.45; padding:0 9px; border-radius:999px; border:1.5px solid var(--fg); color:var(--fg); white-space:nowrap}
+.k-meas{background:var(--fg); color:var(--bg)}
+.k-est{border-style:dashed}
+.k-int{border-style:dotted; border-width:2px}
+.kinds{display:grid; gap:var(--s3) var(--s5); grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin:var(--s4) 0 0}
+.kinds div{display:grid; gap:var(--s1); justify-items:start}
+.kinds dd{margin:0; font-size:15px; color:var(--fg-muted)}
+.kl{display:inline-flex; flex-wrap:wrap; gap:var(--s1) var(--s2)}
+.map-title{font-size:17px; margin:0 0 var(--s3); max-width:30ch}
+.group-note{font-size:15px; color:var(--fg-muted); margin:0 0 var(--s2)}
+.region:focus{outline:none}
+.region:focus-visible{outline:3px solid var(--focus); outline-offset:2px; stroke:var(--focus); stroke-width:4}
+  .region-on{fill:none; stroke:var(--accent); stroke-width:4; pointer-events:none}
+@media (max-width:820px){.site nav a{min-height:44px; display:inline-flex; align-items:center; padding:0}}
+</style>
+
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="site wrap">
+  <a class="brand" href="#top">Gaza Saltwater Wedge</a>
+  <nav aria-label="Sections">
+    <a href="#rule">The 1:40 rule</a>
+    <a href="#gaza">Gaza</a>
+    <a href="#balance">Water balance</a>
+    <a href="#salt">Sources of salt</a>
+    <a href="#unfit">Unfit water</a>
+    <a href="#war">Since 2023</a>
+    <a href="#quiz">Quiz</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch colour theme" data-mode="light">
+      <svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>
+      <svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main class="wrap" id="top">
+
+<section class="hero">
+  <h1>A 1-metre drop in freshwater head can raise the theoretical saltwater interface by approximately 40 metres.</h1>
+  <p class="lead">Move the sliders to see how a falling water table pushes the salt wedge inland in an idealised coastal aquifer. This is the process behind seawater intrusion in Gaza's coastal aquifer, shown in its simplest form.</p>
+  <div class="actions">
+    <a class="btn" href="#gaza">Read the Gaza case
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <a class="link-strong" href="#quiz">Take the quiz</a>
+  </div>
+</section>
+
+<section id="simulator" aria-label="Aquifer simulator">
+  <div class="frame">
+    <div class="inner">
+      <div class="figscroll" role="region" aria-label="Aquifer cross-section" tabindex="0">
+      <svg class="fig" id="sim" viewBox="0 0 1000 360" role="img" aria-labelledby="simT simD">
+        <title id="simT">Cross-section of a coastal aquifer</title>
+        <desc id="simD">The sea is on the left. A wedge of salt water lies under fresh water that floats above it. The theoretical interface between them is drawn at 40 times the water-table height above sea level.</desc>
+        <defs>
+          <clipPath id="aqClip"><path id="clipShape"/></clipPath>
+          <filter id="mixblur" x="-5%" y="-30%" width="110%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+        </defs>
+        <rect x="0" y="0" width="1000" height="360" fill="var(--surface)"/>
+        <path id="sea" fill="var(--salt)" fill-opacity=".85"/>
+        <path id="sand" fill="var(--sand)"/>
+        <g clip-path="url(#aqClip)">
+          <path id="fresh" fill="var(--fresh)" fill-opacity="var(--fresh-a)"/>
+          <path id="saline" fill="var(--salt)" fill-opacity=".92"/>
+        </g>
+        <rect id="clay" fill="var(--clay)"/>
+        <path id="iface0" fill="none" stroke="var(--fg)" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
+        <path id="iface" fill="none" stroke="var(--surface)" stroke-width="2.5"/>
+        <path id="slevel" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-dasharray="2 4"/>
+        <path id="wt0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
+        <path id="wt" fill="none" stroke="var(--accent)" stroke-width="3.5" stroke-linejoin="round"/>
+        <path id="toe" fill="var(--fg)"/>
+        <path id="casing" fill="none" stroke="var(--fg)" stroke-width="3"/>
+        <path id="screen" fill="none" stroke="var(--fg)" stroke-width="9" stroke-dasharray="3 2"/>
+        <g font-family="var(--font-body)" font-weight="700" font-size="22">
+          <text id="tSea" fill="#fff">Sea</text>
+          <text id="tSalt" fill="#fff">Salt water</text>
+          <text id="tFresh" fill="var(--on-fresh)">Fresh water</text>
+          <text id="tClay" fill="var(--on-clay)">Clay base</text>
+          <text id="tWell" fill="var(--fg)" text-anchor="middle" style="paint-order:stroke;stroke:var(--surface);stroke-width:5px">Well</text>
+          <text id="tSL" fill="var(--fg-muted)" font-size="18" text-anchor="end" style="paint-order:stroke;stroke:var(--sand);stroke-width:4px">Sea level</text>
+        </g>
+      </svg>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="head"><span>Water table 1 km inland</span><output id="headOut" for="head">1.25 m</output></label>
+          <input id="head" type="range" min="0.7" max="3" step="0.05" value="1.25">
+        </div>
+        <div class="ctrl">
+          <label for="pump"><span>Drawdown at the well</span><output id="pumpOut" for="pump">0.00 m</output></label>
+          <input id="pump" type="range" min="0" max="1.5" step="0.05" value="0">
+        </div>
+        <fieldset class="ctrl">
+          <legend>Interface</legend>
+          <div class="seg">
+            <label><input type="radio" name="mix" id="mixSharp" checked><span>Sharp</span></label>
+            <label><input type="radio" name="mix" id="mixZone"><span>Mixing zone</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <dl class="readouts">
+        <div><dt>Head at the well</dt><dd id="rHead">1.25 m</dd></div>
+        <div><dt>Theoretical interface under the well</dt><dd id="rIface">50 m<small id="rMargin"></small></dd></div>
+        <div><dt>Well water</dt><dd id="rState"></dd></div>
+        <div><dt>Wedge toe from the shore</dt><dd id="rToe">1,600 m<small id="rToe0"></small></dd></div>
+      </dl>
+      <p class="small fig-note" id="simSentence"></p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:var(--s3)"><p><strong>Educational simulation, not a Gaza model.</strong> It illustrates the idealised Ghyben-Herzberg relation. It is not a hydrogeological model calibrated for the Gaza Strip, and its numbers are not Gaza measurements or predictions.</p>
+<p class="small">Illustrative aquifer: 80 m thick, straight-line water table, well screen 20 to 30 m below sea level, vertical scale exaggerated about 9 times. The drawdown cone is assumed to spread about 600 m either side of the well. Dashed lines show the baseline without drawdown. The wedge toe is where the interface meets the aquifer base, counted from the shore, and it moves with both sliders. A cone at the well can draw up a separate pocket of salt water that is not part of the wedge.</p></div>
+<dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>Sampled or surveyed values.</dd></div><div><dt><span class="kind">Model output</span></dt><dd>Values computed by a model.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures relayed from studies, agencies or NGOs.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>An author's reading of the data.</dd></div></dl>
+</section>
+
+<section class="block" id="rule">
+  <div class="block-head">
+    <h2>The 1:40 rule is a theoretical idealisation, not a Gaza prediction</h2>
+    <p class="lead">Fresh water is about 2.5% lighter than seawater, so it floats on it. Balance the pressure where the two meet and the theoretical depth of the interface follows from the height of the freshwater head.</p>
+  </div>
+  <div class="cols">
+    <div class="stack">
+      <p><span class="eq">z = h × ρf ÷ (ρs − ρf)</span></p>
+      <p>Here h is the freshwater head above sea level, z is the theoretical interface depth below it, ρf is fresh water at 1.000 g/cm³ and ρs is seawater at about 1.025 g/cm³. With those values z is 40 times h. This is the Ghyben-Herzberg relation (Post, Houben and van Engelen 2018). It describes an idealised, static balance. It is not a measurement or a forecast for any real aquifer, Gaza's included.</p>
+      <p>It assumes a sharp, static interface. Real aquifers have a mixing zone from metres to kilometres wide (Werner et al. 2013, USGS Circular 1262), and the ratio runs from about 1:33 to 1:50 as seawater density goes from 1.020 to 1.030. Interface depths in Gaza need field data and calibrated models, such as those cited below.</p>
+    </div>
+    <div class="frame">
+      <div class="inner">
+        <svg class="fig" id="ruleSvg" viewBox="0 0 360 450" role="img" aria-label="Two bars drawn to the same scale: the freshwater head above sea level and the theoretical interface depth below it."></svg>
+        <div class="controls">
+          <div class="ctrl">
+            <label for="rh"><span>Water table height</span><output id="rhOut" for="rh">1.00 m</output></label>
+            <input id="rh" type="range" min="0.1" max="3" step="0.05" value="1">
+          </div>
+          <div class="ctrl">
+            <label for="rd"><span>Seawater density</span><output id="rdOut" for="rd">1.025 g/cm³</output></label>
+            <input id="rd" type="range" min="1.020" max="1.030" step="0.001" value="1.025">
+          </div>
+        </div>
+        <dl class="readouts">
+          <div><dt>Ratio of z to h</dt><dd id="rRatio">1 : 40.0</dd></div>
+          <div><dt>Theoretical interface depth</dt><dd id="rZ">40.0 m</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="gaza">
+  <div class="block-head">
+    <h2>Average chloride in domestic water and wastewater exceeded 250 mg/L in all five provinces in 2009 to 2019</h2>
+    <p class="lead">Gaza draws almost all of its water from the southern tip of the regional Coastal Aquifer. Select a province to compare its 2009 to 2019 average with the taste reference. These are period averages from a study table, not current conditions, and not a map of aquifer or tap-water quality.</p>
+  </div>
+  <dl class="facts">
+    <div><dt>The strip</dt><dd>About 40 km long and 6 to 12 km wide. The area is 365 km², or about 400 km² in some sources.</dd></div>
+    <div><dt>The aquifer</dt><dd>Kurkar sandstone and dune sand over Saqiye Group clays, 100 to 180 m thick in the west and 10 to 80 m in the east, split into four sub-aquifers.</dd></div>
+    <div><dt>Climate</dt><dd>Semi-arid. Rainfall falls from about 400 mm a year in the north to about 200 mm in the south.</dd></div>
+    <div><dt>People</dt><dd>1.76 million in 2014 (PCBS). Built-up area grew from 8.25% in 1982 to 25% in 2010, which reduces recharge (UNEP 2020).</dd></div>
+  </dl>
+  <div class="slot" id="slotMap" data-state="loading">
+    <div class="sk" style="min-height:420px"><span class="tall" style="height:380px"></span><span style="width:60%"></span></div>
+    <div class="ok cols">
+      <div class="map-wrap"><h3 class="map-title">Mean chloride, domestic water and generated wastewater, November 2009 to October 2019 <span class="kind k-est">Reported estimate</span></h3><svg class="fig" id="mapSvg" viewBox="0 0 320 420" role="group" aria-label="Schematic outline of the Gaza Strip divided into five provinces, shaded by mean chloride in domestic water and generated wastewater from November 2009 to October 2019. Use the arrow keys to move between provinces and Enter to select."></svg></div>
+      <div class="stack">
+        <div class="rows" id="clRows"></div>
+        <p class="small">The orange line marks 250 mg/L. This is a taste and acceptability reference, not a health limit. WHO proposes no health-based guideline value for chloride. Its fact sheet gives about 250 mg/L as the level where taste can be detected, and its background document gives roughly 200 to 300 mg/L depending on the associated cation. <span id="clSource"></span> The map outline and governorate boundaries are schematic.</p>
+        <div class="callout" id="clDetail" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="err"><p>The Gaza data did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+  <div class="cols even">
+    <div class="stack">
+      <p class="stat">41.72 km² <span class="small" style="font-family:var(--font-body); font-weight:400">modelled, for 2019</span></p>
+      <p><span class="kind">Model output</span> Not a field measurement. Musallam, Zhou and Jewitt (2023) simulated the area of the top sub-aquifer (A) with chloride above 4,000 mg/L. Their business-as-usual scenario, SC0, gives 51.73 km² for 2040. The authors note that groundwater abstraction may be underestimated by 30%.</p>
+    </div>
+    <div class="stack">
+      <p class="stat">78%</p>
+      <p><span class="kind k-meas">Measured data</span> Share of wells within 2 km of the shore with elevated chloride in a 2000 survey of 101 wells. Coastal values exceed 2,000 mg/L and reach more than 10,000 mg/L at some spots.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="balance">
+  <div class="block-head">
+    <h2>Groundwater abstraction is roughly three to four times the aquifer's sustainable yield</h2>
+    <p class="lead">Sources report different quantities, so the ratio depends on what is in the denominator. Pick a source to see what its figure measures. All figures are reported estimates.</p>
+    <p class="small" style="max-width:70ch">Natural recharge is water entering the aquifer, mainly from rainfall. Safe yield and sustainable yield are abstraction rates that authors judge the aquifer can support, and they depend on the criteria chosen. They are not the same quantity as recharge.</p>
+  </div>
+  <div class="slot" id="slotBalance" data-state="loading">
+    <div class="sk"><span style="width:50%"></span><span class="tall" style="height:160px"></span></div>
+    <div class="ok cols">
+      <div class="stack">
+        <div class="seg" id="balSeg" role="group" aria-label="Source"></div>
+        <div class="bars" id="balBars"></div>
+        <p class="small" id="balNote"></p>
+      </div>
+      <div class="frame">
+        <div class="inner inner-pad stack">
+          <h3>How much would pumping have to fall?</h3>
+          <p class="small">Mid-points of the UNEP 2020 ranges: 180 MCM/yr pumped, 57.5 MCM/yr of safe yield. Return flows and lateral inflow are left out.</p>
+          <div class="ctrl">
+            <label for="cut"><span>Cut abstraction by</span><output id="cutOut" for="cut">0%</output></label>
+            <input id="cut" type="range" min="0" max="80" step="1" value="0">
+          </div>
+          <div class="bars" id="cutBars"></div>
+          <p id="cutText" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+    <div class="err"><p>The water balance data did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+</section>
+
+<section class="block" id="salt">
+  <div class="block-head">
+    <h2>Seawater intrusion is one of several sources of salt in Gaza's groundwater, and no study ranks them</h2>
+    <p class="lead">Not all salty groundwater is seawater intrusion. Brackish inflow from the east and deep brine are different processes, and relict water, brines and dissolved evaporites also count (Werner et al. 2013). Wastewater and fertiliser are mainly a nitrate problem, and the sources reviewed give no share of salinity for them. Select a source to highlight it.</p>
+  </div>
+  <div class="slot" id="slotSalt" data-state="loading">
+    <div class="sk"><span class="tall"></span><span style="width:70%"></span></div>
+    <div class="ok stack" style="gap:var(--s6)">
+      <div class="cols">
+        <div class="frame">
+          <div class="inner">
+            <div class="figscroll narrow" role="region" aria-label="Salinity sources cross-section" tabindex="0">
+            <svg class="fig salt-fig" id="saltFig" viewBox="0 0 640 330" role="img" aria-label="Schematic cross-section from the sea in the west to the eastern border, showing three salinity sources and one contamination pathway, wastewater and return flows, drawn with dashed arrows. Not to scale.">
+              <rect width="640" height="330" fill="var(--surface)"/>
+              <rect x="150" y="60" width="490" height="190" fill="var(--sand)"/>
+              <rect x="150" y="250" width="490" height="60" fill="var(--clay)"/>
+              <path d="M0 60 H150 V310 H0 Z" fill="var(--salt)" fill-opacity=".85"/>
+              <path d="M150 60 H640 V250 H330 Z" fill="var(--fresh)" fill-opacity="var(--fresh-a)"/>
+              <g class="src-shape" data-s="sea"><path d="M150 250 L150 62 L330 250 Z" fill="var(--salt)" fill-opacity=".95"/><text x="160" y="198" fill="#fff" font-size="15" font-weight="700">Seawater wedge</text></g>
+              <g class="src-shape" data-s="east"><path d="M630 150 H420" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"/><path d="M432 136 L414 150 L432 164" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><text x="630" y="130" text-anchor="end" fill="var(--on-fresh)" font-size="16" font-weight="700" style="paint-order:stroke;stroke:var(--sand);stroke-width:4px">Brackish Eocene water</text></g>
+              <g class="src-shape" data-s="brine"><rect x="150" y="226" width="490" height="24" fill="var(--salt)"/><text x="640" y="244" text-anchor="end" fill="#fff" font-size="16" font-weight="700" dx="-10">Deep brine</text><path d="M470 226 V196" stroke="var(--fg)" stroke-width="5" stroke-linecap="round"/><path d="M458 206 L470 192 L482 206" fill="none" stroke="var(--fg)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="src-shape" data-s="human"><path d="M230 8 V44 M290 8 V44" stroke="var(--fg)" stroke-width="5" stroke-dasharray="7 5"/><path d="M230 44 V54 M290 44 V54" stroke="var(--fg)" stroke-width="5" stroke-linecap="round"/><path d="M219 42 L230 56 L241 42 M279 42 L290 56 L301 42" fill="none" stroke="var(--fg)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><text x="320" y="36" fill="var(--fg)" font-size="16" font-weight="700">Sewage and return flows (nitrate)</text></g>
+              <text x="10" y="90" fill="#fff" font-size="16" font-weight="700">Sea</text>
+              <text x="630" y="300" text-anchor="end" fill="var(--on-clay)" font-size="14" font-weight="700">West to east, not to scale. Israel lies east of the strip.</text>
+            </svg>
+            </div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="seg" id="saltSeg" role="group" aria-label="Salinity source"></div>
+          <div class="callout src-card" id="saltCard" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="cols even match">
+        <div class="view">
+          <h3>Eastern inflow comes first</h3>
+          <p>Weinthal et al. (2005) use boron, strontium and oxygen and hydrogen isotopes to argue that natural saline groundwater flowing in from the east is the primary source. Seawater is secondary and limited to the western margin.</p>
+          <p class="small">Their data end around 2005.</p>
+        </div>
+        <div class="view">
+          <h3>Intrusion has grown since 2000</h3>
+          <p>Mushtaha and Walraevens (2023) mapped chloride for 1972 to 2021. Before 2000 supply wells sat far from the sea. Afterwards some stood within 2 km of the coast, and intrusion followed.</p>
+          <p class="small">They also map lateral inflow and upconing.</p>
+        </div>
+      </div>
+      <p class="lead" style="max-width:70ch">The two readings can both hold. They cover different periods, zones and sub-aquifers. No study splits the salinity between the sources, so intrusion is best described as one process among several, likely dominant on the western margin and in deep sub-aquifers since about 2000. That is an interpretation, not a measured share.</p>
+    </div>
+    <div class="err"><p>The salinity data did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+
+  <div class="cols even" id="speed">
+    <div class="stack">
+      <h3>How fast does the wedge move?</h3>
+      <p>Sarsak and Almasri (2013) ran a SEAWAT model of northern Gaza with projected sea-level rise. They estimate seawater moving inland at about 65 m a year now, 35 m a year in a best case and about 80 m a year by 2035 in a low-recharge worst case.</p>
+      <p class="small"><span class="kind">Model output</span> One model, northern Gaza only. The sum below is arithmetic on those rates, not a forecast.</p>
+    </div>
+    <div class="frame">
+      <div class="inner inner-pad stack">
+        <fieldset>
+          <legend>Rate</legend>
+          <div class="seg" id="rateSeg">
+            <button type="button" data-rate="35" aria-pressed="false">35 m/yr best</button>
+            <button type="button" data-rate="65" aria-pressed="true">65 m/yr now</button>
+            <button type="button" data-rate="80" aria-pressed="false">80 m/yr worst</button>
+          </div>
+        </fieldset>
+        <div class="ctrl">
+          <label for="yrs"><span>Years from now</span><output id="yrsOut" for="yrs">9</output></label>
+          <input id="yrs" type="range" min="1" max="9" step="1" value="9">
+        </div>
+        <div class="band" id="distBand" role="img" aria-label="Distance inland"><div class="solid c-pump" id="distFill"></div><div class="tick" style="left:25%"></div></div>
+        <p id="distText" class="tnum" aria-live="polite"></p>
+        <p class="small">The bar runs from 0 to 800 m. The line marks 200 m.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="unfit">
+  <div class="block-head">
+    <h2>Unfit-water shares run from 0.9% to 97% because each counts a different sample and standard, so they cannot be ranked against each other</h2>
+    <p class="lead">The same word covers aquifer water, municipal wells and household taps. Each group below is a different kind of sample, so read the sample type and the threshold before the percentage.</p>
+  </div>
+  <div class="slot" id="slotUnfit" data-state="loading">
+    <div class="sk"><span style="width:40%"></span><span class="tall"></span></div>
+    <div class="ok stack">
+      <div class="seg" id="unfitSeg" role="group" aria-label="Show">
+        <button type="button" data-mode="failing" aria-pressed="true">Above stated threshold</button>
+        <button type="button" data-mode="meeting" aria-pressed="false">Below stated threshold</button>
+      </div>
+      <div id="unfitList"></div>
+      <p class="small" id="tierKey"></p>
+    </div>
+    <div class="err"><p>The comparison data did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+</section>
+
+<section class="block" id="war">
+  <div class="block-head">
+    <h2>Since October 2023, water services have been badly damaged, and no post-war groundwater quality survey was identified in the sources reviewed</h2>
+    <p class="lead">Each entry carries its date and source type. UN reports usually rely on partner and authority data, and NGO and local-authority statements are labelled as such.</p>
+  </div>
+  <div class="callout">
+    <strong>What is missing.</strong> No publicly documented post-October 2023 groundwater quality survey was identified in the sources reviewed. The only groundwater observation found is MSF's report on two hospital boreholes in October 2025, which covers one site and was not independently verified here. UNEP calls aquifer contamination likely, with its extent unknown. In the near term, sewage and cesspit leakage probably matters more than seawater intrusion, which is slower. That is a scientific interpretation, not a measurement.
+    <br><span class="small">Sources last reviewed: 16 November 2026. The newest dated source is 15 October 2026.</span>
+  </div>
+  <dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>A sample result reported from the field.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures from agencies or NGOs, often relayed from partners.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>A judgment such as "likely", not a measured result.</dd></div></dl>
+  <div class="slot" id="slotWar" data-state="loading">
+    <div class="sk"><span style="width:50%"></span><span class="tall"></span></div>
+    <div class="ok stack">
+      <div class="seg" id="warSeg" role="group" aria-label="Filter by source type"></div>
+      <div class="log" id="warLog"></div>
+    </div>
+    <div class="err"><p>The timeline did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+  <p class="small">Reduced pumping from damage and fuel shortages is not recovery. A 2019 laboratory and numerical study shows seawater can advance after pumping stops, and a 2012 UN-linked outlook put recovery at decades.</p>
+</section>
+
+<section class="block" id="quiz">
+  <div class="block-head">
+    <h2>Six questions on what the evidence supports</h2>
+  </div>
+  <div class="slot quiz" id="slotQuiz" data-state="loading">
+    <div class="sk"><span style="width:80%"></span><span class="tall" style="height:200px"></span></div>
+    <div class="ok frame"><div class="inner inner-pad stack" id="quizBox"></div></div>
+    <div class="err"><p>The questions did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
+  </div>
+</section>
+
+<section class="block" id="conclusion">
+  <div class="block-head">
+    <h2>What the Gaza case shows</h2>
+  </div>
+  <div class="cols even">
+    <div class="stack">
+      <h3>Head sets depth</h3>
+      <p>When pumping runs roughly three to four times the sustainable yield and heads sit several to more than 15 m below sea level, the head that holds seawater back is lost. How far and how fast seawater advances then depends on time and aquifer geometry. The 1:40 relation is a guide to that balance, not a prediction.</p>
+      <h3>Seawater is one source among several</h3>
+      <p>Eastern inflow and deep brine add salt inland. Nitrate from sewage and fertiliser is a separate contamination problem, not a quantified source of salinity, and protecting the aquifer from the sea would not fix it.</p>
+    </div>
+    <div class="stack">
+      <h3>Recovery is slow</h3>
+      <p>Model results for Gaza (Qahman and Larabi; Selmi) show heads rising with less pumping and more recharge over 17 to 20 years. Those runs describe water levels, not salinity. In the Netherlands, salinity lags can exceed 100 years in some aquifers (Werner et al. 2013), and a 2012 UN-linked outlook said decades.</p>
+      <h3>Unverified in the sources</h3>
+      <p>The Palestinian Water Authority target of cutting abstraction from 180 to 70 MCM/yr by 2032 appears only in a secondary source. The "unusable by 2016, irreversible by 2020" projection comes from a news-service summary of a UN report. No source reviewed gives a quantified recovery time for Gaza groundwater quality.</p>
+    </div>
+  </div>
+  <div class="stack" style="max-width:70ch">
+    <h3>Less pumping is not the same as recovery <span class="kind k-int">Scientific interpretation</span></h3>
+    <p>Reducing abstraction does not mean the aquifer recovers straight away. Hydraulic recovery, the rise of groundwater levels, and water-quality recovery, the fall of salinity and contaminants, are separate outcomes. Levels can improve while the salt already in the aquifer stays, and a 2019 laboratory and numerical study shows seawater can keep advancing after pumping stops. Recovery in Gaza should be judged on both measures, and the sources reviewed quantify neither for the present day.</p>
+  </div>
+</section>
+
+<section class="block" id="refs">
+  <div class="block-head"><h2>References</h2></div>
+  <ol class="refs">
+    <li>Werner, A.D. et al. (2013). Seawater intrusion processes, investigation and management. Advances in Water Resources. <a href="https://infoscience.epfl.ch/record/175529/files/Manuscript_20120228_final.pdf?version=1">Full text</a></li>
+    <li>Post, V.E.A., Houben, G.J., van Engelen, J. (2018). What is the Ghijben-Herzberg principle and who formulated it? Hydrogeology Journal. <a href="https://www.literature.wolkersdorfer.info/literature/What%20is%20the%20Ghijben-Herzberg%20principle%20and%20who%20formulated%20it.pdf">Full text</a></li>
+    <li>USGS (2003). Circular 1262, Saltwater intrusion in the United States. <a href="https://pubs.usgs.gov/circ/2003/circ1262">pubs.usgs.gov</a></li>
+    <li>Weinthal, E., Vengosh, A. et al. (2005). The water crisis in the Gaza Strip: prospects for resolution. Ground Water 43(5). <a href="https://sites.nicholas.duke.edu/avnervengosh/files/2011/08/Gaza_GW.pdf">Full text</a></li>
+    <li>Musallam, I., Zhou, Y. and Jewitt, G. (2023). Simulation of groundwater flow and seawater intrusion in response to climate change and human activities on the coastal aquifer of Gaza Strip, Palestine. Hydrogeology Journal 31, 1953 to 1969. <a href="https://link.springer.com/content/pdf/10.1007/s10040-023-02694-7.pdf">Full text</a></li>
+    <li>Mushtaha, A.M. and Walraevens, K. (2023). Evolution of salinity in the Gaza Strip over the last five decades. <a href="https://marineinfo.org/doc/publication/367764">Abstract</a></li>
+    <li>Sarsak, R. and Almasri, M.N. (2013). Seawater intrusion into the coastal aquifer in the Gaza Strip: a computer-modelling study. <a href="https://staff-old.najah.edu/malmasri/published-research/seawater-intrusion-coastal-aquifer-gaza-strip-computer-modelling-study">Author page</a></li>
+    <li>Qahman, K. and Larabi, A. (2006). Evaluation and numerical modeling of seawater intrusion in the Gaza aquifer. Hydrogeology Journal. <a href="https://repository.geologyscience.ru/items/b042e62a-edad-4b37-839d-183285457181/full">Abstract</a></li>
+    <li>Selmi, A. (2013). Coastal aquifer case study (Gaza Strip). PhD thesis, University of Milano-Bicocca. <a href="https://boa.unimib.it/bitstream/10281/40833/1/phd_unimib_725010.pdf">Full text</a></li>
+    <li>Brugger, F. et al. (2025). Household water quality in the Gaza Strip, January to March 2023. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12220596">PubMed Central</a></li>
+    <li>UNEP (2020). Environmental assessment of the Gaza Strip. <a href="https://www.un.org/unispal/?p=235915">UNISPAL</a></li>
+    <li>Fanack Water. Gaza water crisis. <a href="https://water.fanack.com/publications/gaza-water-crisis/">fanack.com</a></li>
+    <li>Aquapedia. Coastal Aquifer (Israel, Palestine). <a href="https://aquapedia.waterdiplomacy.org/wiki/index.php/Coastal_Aquifer_(Israel,_Palestine)">waterdiplomacy.org</a></li>
+    <li>WHO. Chloride in drinking-water. <a href="https://cdn.who.int/media/docs/default-source/wash-documents/wash-chemicals/chloride-fs-new.pdf">Fact sheet</a></li>
+    <li>Post-2023 reports (UNEP, OCHA, UNICEF, MSF, Al Mezan) are linked from each entry in the timeline above.</li>
+  </ol>
+</section>
+
+</main>
+
+<footer class="site-foot wrap">
+  <p class="small">Compiled 16 November 2026 from a research report prepared for an Environmental Geology course. Sources last reviewed 16 November 2026; the Musallam et al. table and the WHO chloride fact sheet were re-checked on 23 November 2026. The latest source is dated 15 October 2026. Figures flagged as unverified or definition-dependent are marked where they appear.</p>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var nf=new Intl.NumberFormat('en-US');
+function f1(v){return v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})}
+function f2(v){return v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+var CHECK='<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var CROSS='<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+var EXT='<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;vertical-align:-2px"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+
+/* theme */
+var root=document.documentElement, themeBtn=$('#themeBtn');
+function effective(){var t=root.getAttribute('data-theme'); if(t) return t; return (window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'}
+function syncBtn(){themeBtn.setAttribute('data-mode',effective())}
+try{var st=localStorage.getItem('gsw-theme'); if(st) root.setAttribute('data-theme',st)}catch(e){}
+syncBtn();
+themeBtn.addEventListener('click',function(){var n=effective()==='dark'?'light':'dark'; root.setAttribute('data-theme',n); try{localStorage.setItem('gsw-theme',n)}catch(e){} syncBtn()});
+if(window.matchMedia){try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBtn)}catch(e){}}
+
+/* simulator */
+(function(){
+var S={B:80,xMin:-400,xMax:3100,W:1000,k:2.6,top:18,mTop:30,xw:1000,sc:20,sb:30};
+function X(x){return (x-S.xMin)*S.W/(S.xMax-S.xMin)}
+function Y(d){return S.mTop+(d+S.top)*S.k}
+function P(x,d){return X(x).toFixed(1)+','+Y(d).toFixed(1)}
+function line(pts){return pts.map(function(p,i){return (i?'L':'M')+P(p[0],p[1])}).join(' ')}
+var xs=[]; for(var x=0;x<=S.xMax;x+=25) xs.push(x);
+var el={}; ['sea','sand','clipShape','fresh','saline','clay','iface0','iface','slevel','wt0','wt','toe','casing','screen','tSea','tSalt','tFresh','tClay','tWell','tSL'].forEach(function(id){el[id]=document.getElementById(id)});
+var head=$('#head'), pump=$('#pump'), mixZone=$('#mixZone');
+function elev(x){return 0.5+0.0045*x}
+// static geometry
+var sandD='M'+P(S.xMin,24)+' L'+P(0,0)+' L'+P(0,-0.5)+' L'+P(S.xMax,-elev(S.xMax))+' L'+P(S.xMax,S.B)+' L'+P(S.xMin,S.B)+' Z';
+el.sand.setAttribute('d',sandD); el.clipShape.setAttribute('d',sandD);
+el.sea.setAttribute('d','M'+P(S.xMin,0)+' L'+P(0,0)+' L'+P(S.xMin,24)+' Z');
+el.clay.setAttribute('x',0); el.clay.setAttribute('width',S.W); el.clay.setAttribute('y',Y(S.B)); el.clay.setAttribute('height',Y(S.B+18)-Y(S.B));
+el.slevel.setAttribute('d','M'+P(0,0)+' L'+P(S.xMax,0));
+el.casing.setAttribute('d','M'+P(S.xw,-elev(S.xw)-3)+' L'+P(S.xw,S.sb));
+el.screen.setAttribute('d','M'+P(S.xw,S.sc)+' L'+P(S.xw,S.sb));
+function place(e,x,d,dx){e.setAttribute('x',X(x)+(dx||0)); e.setAttribute('y',Y(d))}
+place(el.tSea,-385,12); place(el.tSalt,60,66); place(el.tFresh,1850,22); place(el.tClay,1800,S.B+11);
+el.tWell.setAttribute('x',X(S.xw)); el.tWell.setAttribute('y',Y(-elev(S.xw)-3)-8);
+el.tSL.setAttribute('x',X(S.xMax)-8); el.tSL.setAttribute('y',Y(0)+22);
+function update(){
+  var h1=+head.value, s=+pump.value, mix=mixZone.checked, B=S.B;
+  function h0(x){return h1*x/1000}
+  function h(x){return h0(x)-s*Math.exp(-Math.pow((x-S.xw)/600,2))}
+  function z(hh){return Math.min(B,40*Math.max(hh,0))}
+  var wt=xs.map(function(x){return [x,-h(x)]}), wt0=xs.map(function(x){return [x,-h0(x)]});
+  el.wt.setAttribute('d',line(wt));
+  el.wt0.setAttribute('d',s>0?line(wt0):'');
+  el.fresh.setAttribute('d',line(wt)+' L'+P(S.xMax,B)+' L'+P(0,B)+' Z');
+  var top=xs.map(function(x){var zz=z(h(x)); return [x,zz>=B?B+8:zz]});
+  el.saline.setAttribute('d','M'+P(S.xMin-60,-10)+' L'+P(0,-10)+' '+top.map(function(p){return 'L'+P(p[0],p[1])}).join(' ')+' L'+P(S.xMax,B+40)+' L'+P(S.xMin-60,B+40)+' Z');
+  if(mix) el.saline.setAttribute('filter','url(#mixblur)'); else el.saline.removeAttribute('filter');
+  function ifacePath(hf){
+    var d='',pen=false,px=null;
+    xs.forEach(function(x){
+      var zz=z(hf(x));
+      if(zz<B){ if(!pen&&px!==null) d+='M'+P(px,B)+' L'+P(x,zz)+' '; else d+=(pen?'L':'M')+P(x,zz)+' '; pen=true; }
+      else { if(pen){d+='L'+P(x,B)+' '; pen=false} }
+      px=x;
+    });
+    return d;
+  }
+  el.iface.setAttribute('d',ifacePath(h)); el.iface.style.display=mix?'none':'';
+  el.iface0.setAttribute('d',s>0?ifacePath(h0):'');
+  function toeOf(hf){
+    var thr=B/40, px=0, ph=hf(0);
+    if(ph>=thr) return 0;
+    for(var x=5;x<=S.xMax;x+=5){var hv=hf(x); if(hv>=thr) return px+(thr-ph)/(hv-ph)*(x-px); px=x; ph=hv}
+    return null;
+  }
+  var xToe=toeOf(h), xToe0=toeOf(h0);
+  if(xToe!==null){var tx=X(xToe),ty=Y(B); el.toe.setAttribute('d','M'+tx+','+(ty+2)+' l-8,13 l16,0 z')} else el.toe.setAttribute('d','');
+  var hW=h(S.xw), zW=z(hW), margin=zW-S.sb, z0=z(h0(S.xw));
+  $('#headOut').textContent=f2(h1)+' m'; $('#pumpOut').textContent=f2(s)+' m';
+  $('#rHead').textContent=f2(hW)+' m';
+  $('#rIface').firstChild.nodeValue=nf.format(Math.round(zW))+' m';
+  $('#rMargin').textContent=margin>0?nf.format(Math.round(margin))+' m below the screen bottom':'At or above the screen bottom';
+  var st=$('#rState'), cls,txt;
+  if(zW<=S.sb){cls='s-bad';txt='Saline'} else if(margin<12){cls='s-warn';txt='At risk'} else {cls='s-good';txt='Fresh'}
+  st.innerHTML='<span class="state '+cls+'">'+txt+'</span>';
+  $('#rToe').firstChild.nodeValue=xToe!==null?nf.format(Math.round(xToe))+' m':'Beyond 3,100 m';
+  $('#rToe0').textContent=s>0?'Baseline without drawdown: '+(xToe0!==null?nf.format(Math.round(xToe0))+' m':'beyond 3,100 m'):'Baseline: no drawdown';
+  var pocket=zW<B && xToe!==null && xToe<S.xw;
+  var sent;
+  if(s<=0) sent='Raise the drawdown slider to lower the water table around the well and watch the theoretical interface rise beneath it.';
+  else if(hW<=0) sent='The water table at the well is at or below sea level, so no fresh water column is left to support the interface.';
+  else sent='Pumping lowered the head at the well by '+f2(s)+' m, so the theoretical interface rose '+nf.format(Math.round(z0-zW))+' m.'+(pocket?' The wedge toe stays at '+nf.format(Math.round(xToe))+' m. The salt water under the well is a separate drawdown pocket.':'');
+  $('#simSentence').textContent=sent;
+}
+head.addEventListener('input',update); pump.addEventListener('input',update);
+$$('input[name=mix]').forEach(function(r){r.addEventListener('change',update)});
+update();
+})();
+
+/* 1:40 rule widget */
+(function(){
+var svg=$('#ruleSvg'), rh=$('#rh'), rd=$('#rd'), K=2.4, y0=60;
+function draw(){
+  var h=+rh.value, d=+rd.value, ratio=1/(d-1), zz=h*ratio;
+  var g='';
+  for(var m=0;m<=140;m+=20){var y=y0+m*K; g+='<line x1="20" x2="290" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/><text x="300" y="'+(y+5)+'" font-size="14" fill="var(--fg-muted)" font-family="var(--font-body)">'+m+' m</text>'}
+  g+='<rect x="60" y="'+(y0-h*K)+'" width="56" height="'+(h*K)+'" fill="var(--fresh)"/>';
+  g+='<rect x="170" y="'+y0+'" width="56" height="'+(zz*K)+'" fill="var(--salt)"/>';
+  g+='<line x1="20" x2="290" y1="'+y0+'" y2="'+y0+'" stroke="var(--fg)" stroke-width="2"/>';
+  g+='<text x="20" y="'+(y0-30)+'" font-size="14" font-weight="700" fill="var(--fg)" font-family="var(--font-body)">Sea level</text>';
+  g+='<text x="88" y="'+(y0-h*K-8)+'" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)" font-family="var(--font-body)">'+f2(h)+' m</text>';
+  g+='<text x="198" y="'+(y0+zz*K+20)+'" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)" font-family="var(--font-body)">'+f1(zz)+' m</text>';
+  svg.innerHTML=g;
+  $('#rhOut').textContent=f2(h)+' m'; $('#rdOut').textContent=d.toFixed(3)+' g/cm³';
+  $('#rRatio').textContent='1 : '+f1(ratio); $('#rZ').textContent=f1(zz)+' m';
+}
+rh.addEventListener('input',draw); rd.addEventListener('input',draw); draw();
+})();
+
+/* scenario arithmetic */
+(function(){
+var rate=65, yrs=$('#yrs');
+function upd(){
+  var y=+yrs.value, d=rate*y;
+  $('#yrsOut').textContent=y;
+  $('#distFill').style.width=Math.min(100,d/800*100)+'%';
+  $('#distText').innerHTML='<strong>'+nf.format(d)+' m</strong> inland after '+y+(y===1?' year':' years')+' at '+rate+' m a year.';
+}
+$$('#rateSeg button').forEach(function(b){b.addEventListener('click',function(){
+  rate=+b.getAttribute('data-rate'); $$('#rateSeg button').forEach(function(o){o.setAttribute('aria-pressed',o===b?'true':'false')}); upd();
+})});
+yrs.addEventListener('input',upd); upd();
+})();
+
+/* data sections */
+var DATA=null;
+var INLINE={"outline":[[34.216,31.324],[34.255,31.35],[34.3,31.385],[34.35,31.425],[34.4,31.47],[34.445,31.515],[34.49,31.558],[34.527,31.597],[34.56,31.56],[34.52,31.49],[34.43,31.43],[34.385,31.35],[34.335,31.29],[34.27,31.222]],"chloride":{"threshold":250,"max":1800,"source":"Musallam, Zhou and Jewitt (2023), Table 1, \"Domestic water and generated wastewater\" average chloride by province, November 2009 to October 2019","regions":[{"id":"north","name":"North Gaza","cl":387,"lat":[31.535,31.62]},{"id":"gaza","name":"Gaza","cl":1566,"lat":[31.46,31.535]},{"id":"middle","name":"Middle Area","cl":1130,"lat":[31.385,31.46]},{"id":"khan","name":"Khan Younis","cl":962,"lat":[31.305,31.385]},{"id":"rafah","name":"Rafah","cl":1048,"lat":[31.2,31.305]}],"period":"November 2009 to October 2019"},"balance":[{"id":"pwa","label":"PWA 2011 and 2014","recharge":[55,57],"abstraction":[170,200],"note":"Reported as a sustainable yield of 55 to 57 MCM/yr against 170 to 200 MCM/yr pumped. Relayed by Fanack, citing the Palestinian Water Authority and the World Bank.","measure":"Sustainable yield"},{"id":"unep","label":"UNEP 2020","recharge":[55,60],"abstraction":[160,200],"note":"Reported as a safe yield of 55 to 60 MCM/yr against 160 to 200 MCM/yr abstracted.","measure":"Safe yield"},{"id":"aqua","label":"Aquapedia (PWA 2014)","recharge":[55,55],"abstraction":[180,180],"note":"Reported as recharge of about 55 MCM/yr against about 180 MCM/yr pumped, from more than 5,000 wells, mostly agricultural and 40 to 70 m deep.","measure":"Recharge, as reported"},{"id":"mezan","label":"Al Mezan citing PWA","recharge":[55,55],"abstraction":[190,190],"note":"The source summary reviewed gives about 55 and about 190 MCM/yr without saying whether 55 is recharge or a yield. An advocacy organisation relaying Palestinian Water Authority figures.","measure":"Not named by the source"},{"id":"weinthal","label":"Weinthal et al. 2005","recharge":[35,35],"abstraction":[150,155],"note":"Counts natural recharge only (35 MCM/yr) in the ratio above. The paper uses this figure and adds 52 MCM/yr of return flows and 37 MCM/yr of lateral inflow in its water balance, which gives a modelled deficit of about 30 MCM/yr. A ratio to natural recharge alone is not like for like with the yield figures.","measure":"Natural recharge only"}],"salt":[{"id":"sea","name":"Seawater intrusion","where":"Western margin and deeper sub-aquifers","evidence":"Chloride above 2,000 mg/L along the coast and above 10,000 mg/L at some spots (PWA data, via Fanack). A 2000 survey found 78% of wells within 2 km of the shore with elevated chloride, and transient electromagnetic data placed seawater up to 2 km inland in deeper sub-aquifers.","status":"Documented. Its share of the total is not quantified.","type":"Salinity source. Seawater moving into the aquifer.","kinds":["meas","int"]},{"id":"east","name":"Brackish groundwater inflow","where":"Eastern Gaza, 10 to 15 km from the coast","evidence":"Eocene-derived groundwater enters from the Israeli side. Weinthal et al. (2005) model it at about 1,500 mg/L chloride at the eastern border and, using boron, strontium and isotope data, call it the primary source. Mushtaha and Walraevens (2023) also map lateral inflow above 1,000 mg/L.","status":"Documented. Primary or secondary depending on the study.","type":"Salinity source. Natural saline groundwater flowing in from the east.","kinds":["model","int"]},{"id":"brine","name":"Deep brine upconing","where":"Central and southern Gaza, deep zones","evidence":"Deep piezometers recorded 50,000 to 66,000 ppm, with brines about 120 m below sea level at Deir El Balah, Khan Younis and south of Gaza City (2000 survey). Mushtaha and Walraevens (2023) report inland areas with high chloride from upconing.","status":"Documented in deep zones. The area it affects is uncertain.","type":"Salinity source. Deep brine drawn upward by pumping.","kinds":["meas","int"]},{"id":"human","name":"Wastewater and return flows","where":"Across the strip, strongest in urban areas","evidence":"About 52 MCM/yr of return flows and wastewater recharge in 2005 (Weinthal et al.). Untreated or partly treated sewage discharge was about 90,000 m³/day in 2012 and 110,000 m³/day in 2018 (UNEP 2020). Sewage and fertiliser are the documented nitrate sources; no figure in the data shown here links them to a share of aquifer salinity.","status":"Documented for nitrate. The sources reviewed give no share of aquifer salinity for this pathway.","type":"Contamination pathway, mainly nitrate. Not shown here as a quantified salinity source.","kinds":["est","int"]}],"unfit":[{"group":"Aquifer water","label":"About 4% potable","failing":96,"measure":"Share of the roughly 180 MCM/yr abstracted that is potable","source":"UNEP 2020, relaying the PWA","tier":"un","kinds":["est"]},{"group":"Aquifer water","label":"96.2% unfit","failing":96.2,"measure":"Coastal Aquifer water against WHO standards","source":"PWA estimate relayed by Al Mezan","tier":"local","kinds":["est"]},{"group":"Aquifer water","label":"97% not suitable","failing":97,"measure":"Aquifer water","source":"NGO network, reported by Jordan News. Not verified","tier":"secondary","kinds":["est"]},{"group":"Supply water, sample type not stated by the source","label":"More than 96% unfit","failing":96,"measure":"Domestic supply","source":"PWA 2014, relayed by Fanack","tier":"secondary","kinds":["est"]},{"group":"Municipal wells","label":"About 3.6% of wells below both thresholds","failing":96.4,"measure":"Wells below the chloride and nitrate thresholds together (2015)","source":"PWA data, relayed by INSS","tier":"secondary","kinds":["meas"]},{"group":"Municipal wells","label":"About 1 in 5 wells below the chloride threshold","failing":80,"measure":"Municipal wells, chloride only","source":"Brugger et al. 2025, PWA 2017 data","tier":"peer","kinds":["meas"]},{"group":"Municipal wells","label":"About 1 in 9 wells below the nitrate threshold","failing":89,"measure":"Municipal wells, nitrate only","source":"Brugger et al. 2025, PWA 2017 data","tier":"peer","kinds":["meas"]},{"group":"Household tap water","label":"0.9% of tap samples above 50 mg/L nitrate","failing":0.9,"measure":"Household tap samples, January to March 2023. Tankers supplied drinking water to 82.3% of households and piped water to 4.4%","source":"Brugger et al. 2025, survey of 905 households","tier":"peer","kinds":["meas"],"groupNote":"Not comparable with the aquifer and well shares above. Tap samples describe what households received, mostly from tankers, not the aquifer."}],"tiers":{"un":"UN or multilateral","peer":"Peer-reviewed","ngo":"Humanitarian NGO","local":"Human-rights NGO or local authority","secondary":"Secondary or unverified"},"war":[{"date":"2024-06-18","dateLabel":"18 Jun 2024","tier":"un","org":"UNEP","text":"Preliminary assessment: contamination of the Coastal Aquifer by chemicals and heavy metals is likely, but its extent is unknown. UNEP asks for sampling as soon as conditions allow. A World Bank, EU and UN interim assessment puts water and sanitation damage above US$500 million.","url":"https://www.un.org/unispal/document/report-environmental-impact-in-gaza-unep-18jun24/","kinds":["int","est"]},{"date":"2025-02-01","dateLabel":"Feb 2025","tier":"un","org":"World Bank, EU and UN","text":"89% of water and sanitation sector assets destroyed or damaged. Cited here as reported by MSF.","url":"https://www.aerzte-ohne-grenzen.de/sites/default/files/2026-04/2026-report-gaza-water-as-a-weapon.pdf","kinds":["est"]},{"date":"2025-06-01","dateLabel":"Jun 2025","tier":"un","org":"UNICEF","text":"More than 60% of 196 public and NGO-run desalination plants damaged. Cited here as reported by MSF.","url":"https://www.aerzte-ohne-grenzen.de/sites/default/files/2026-04/2026-report-gaza-water-as-a-weapon.pdf","kinds":["est"]},{"date":"2025-09-23","dateLabel":"23 Sep 2025","tier":"un","org":"UNEP","text":"Groundwater contamination is likely. None of Gaza's wastewater treatment facilities is operational. Storage and pumping facilities lost 84% of capacity (9 of 54 active in April 2025). Remaining desalination capacity is about 31% of the October 2023 level. Data run to 1 September 2025.","url":"https://www.un.org/unispal/document/unep-environmental-impact-of-the-escalation-of-conflict-in-the-gaza-strip/","kinds":["est","int"]},{"date":"2025-10-10","dateLabel":"10 Oct 2025","tier":"un","org":"OCHA","text":"The ceasefire takes effect.","url":"https://www.un.org/unispal/document/ocha-gaza-humanitarian-response-situation-report-no-66/","kinds":[]},{"date":"2026-02-06","dateLabel":"6 Feb 2026","tier":"un","org":"OCHA","text":"The Gaza City Mekorot valve reopened on 2 February. Of about 14,000 m³ reportedly supplied, about 6,000 m³ arrived.","url":"https://www.un.org/unispal/document/ocha-gaza-humanitarian-response-situation-report-no-66/","kinds":["est"]},{"date":"2026-04-21","dateLabel":"21 Apr 2026","tier":"un","org":"OCHA","text":"16 of 73 sewage pumping stations operational. About 40,000 m³/day of sewage reaches the sea, residential areas and groundwater. Hundreds of wells and plants face irreversible failure without lubricant and spare parts.","url":"https://www.un.org/unispal/document/ocha-humanitarian-situation-report-1-may-2026/","kinds":["est"]},{"date":"2026-04-30","dateLabel":"Apr 2026","tier":"ngo","org":"MSF","text":"Report with advocacy framing in its title. About 1.3 million L/day of drinking water produced as of January 2026. In October 2025, as reported by MSF, one of two Nasser Hospital boreholes was contaminated with E. coli and faecal coliform and the other was highly saline. Its access and approval statements are MSF's own and were not independently verified here.","url":"https://www.aerzte-ohne-grenzen.de/sites/default/files/2026-04/2026-report-gaza-water-as-a-weapon.pdf","kinds":["meas","est"]},{"date":"2026-05-29","dateLabel":"29 May 2026","tier":"un","org":"UNICEF","text":"Desalination output of 20,000 m³/day in March fell to 16,000 m³/day in April. Average availability was about 4.5 to 6 litres per person per day in late March (OCHA, 27 March). 82% of families are water insecure.","url":"https://www.unicef.org/media/181051/file/State-of-Palestine-Humanitarian-Situation-Update%28WASH-in-the-Gaza-Strip%29,29-May-2026.pdf.pdf","kinds":["est"]},{"date":"2026-06-15","dateLabel":"Mid-2026","tier":"local","org":"Al Mezan","text":"Based largely on interviews with water-authority officials in May 2026. About 123,000 m³/day available against about 300,000 m³/day before the war. Officials state that about 97% of groundwater fails WHO standards, with chloride above 1,500 mg/L. These are assertions, and no sampling campaign is described.","url":"https://www.mezan.org/uploads/files/2026/6/1781862893THIRST%20AS%20A%20WEAPON.pdf","kinds":["est"]},{"date":"2026-10-15","dateLabel":"15 Oct 2026","tier":"un","org":"OCHA","text":"Drinking-water production for 6 to 12 October was 75% of the previous week and 66% of mid-September. The Gaza City Mekorot pipeline was offline most of eight days. The report contains no well or groundwater data.","url":"https://www.ochaopt.org/content/humanitarian-situation-report-15-october-2026","kinds":["est"]}],"quiz":[{"q":"In the idealised Ghyben-Herzberg relation, with densities of 1.000 and 1.025 g/cm³, a water table 1 m above sea level supports a theoretical interface how far below sea level?","options":["About 4 m","About 10 m","About 40 m","About 400 m"],"answer":2,"why":"z = h × 1.000 ÷ (1.025 − 1.000) = 40 h, so 1 m of head gives about 40 m, and a 1 m drop in head raises the theoretical interface about 40 m. The relation assumes static conditions and a sharp interface. Real aquifers need calibrated models."},{"q":"UNEP (2020) gives Gaza's safe yield as 55 to 60 MCM/yr and abstraction as 160 to 200 MCM/yr. About how many times the safe yield is being pumped?","options":["About the same","About 1.5 times","About 3 times","About 10 times"],"answer":2,"why":"160 ÷ 60 is 2.7 and 200 ÷ 55 is 3.6, so roughly three to four times. Other sources give similar ratios, but they quote natural recharge, safe yield or sustainable yield, which are different quantities."},{"q":"Which statement fits the evidence on where Gaza's salt comes from?","options":["Seawater intrusion is the only source.","There are several sources, and studies disagree about their weights.","Eastern inflow is the only source, so pumping has no effect.","Salinity is natural, so pumping does not change it."],"answer":1,"why":"Seawater intrusion, brackish Eocene inflow from the east and deep brine are documented salinity sources. Wastewater is documented mainly for nitrate. Weinthal et al. (2005) rank eastern inflow first, and Mushtaha and Walraevens (2023) show intrusion growing after 2000. No study splits the total between them."},{"q":"How can \"more than 96% of supplied water is unfit\" and \"0.9% of household tap samples exceed the nitrate guideline\" both be true?","options":["One of them must be wrong.","They count different things, and most households drank tanker water.","The tap survey used a looser nitrate limit.","Nitrate and chloride cancel each other out."],"answer":1,"why":"In the January to March 2023 survey, tankers supplied drinking water to 82.3% of households and piped municipal water to 4.4%. Tap samples do not describe the aquifer."},{"q":"What do UN reports since October 2023 say about contamination of the aquifer itself?","options":["It is measured and confirmed at severe levels.","It is likely but unquantified, and no post-October 2023 groundwater quality survey was identified.","It has been ruled out.","Only Israel has measured it."],"answer":1,"why":"UNEP calls contamination likely in June 2024 and September 2025. No publicly documented post-October 2023 groundwater quality survey was identified in the sources reviewed. The only groundwater observation found is MSF's report on two hospital boreholes, which is one site, not a survey."},{"q":"War damage and fuel shortages cut pumping. Why does that not mean the aquifer is recovering?","options":["Aquifers refill within months.","The cone of depression persists, seawater can keep advancing after pumping stops, and untreated sewage adds contamination.","Seawater cannot move without pumping.","Recharge from sewage is clean."],"answer":1,"why":"A 2019 laboratory and numerical study shows seawater can advance further inland after pumping stops. UN reporting describes sewage reaching groundwater. Water levels (hydraulic recovery) and water quality (salinity and contaminants) are separate outcomes."}]};
+function setState(s){$$('.slot').forEach(function(e){e.setAttribute('data-state',s)})}
+function boot(d){DATA=d; renderMap(); renderBalance(); renderSalt(); renderUnfit(); renderWar(); renderQuiz(); setState('ready')}
+function load(){
+  setState('loading');
+  var done=false;
+  function fallback(err){ if(done) return; done=true; console.error(err); try{boot(INLINE)}catch(e){console.error(e); setState('error')} }
+  try{
+    fetch('data.json',{cache:'no-cache'}).then(function(r){if(!r.ok) throw new Error('HTTP '+r.status); return r.json()}).then(function(d){ if(done) return; done=true; try{boot(d)}catch(e){console.error(e); done=false; fallback(e)} }).catch(fallback);
+  }catch(e){ fallback(e) }
+}
+$$('[data-retry]').forEach(function(b){b.addEventListener('click',load)});
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeUrl(u){return /^https?:\/\//i.test(u)?esc(u):'#'}
+var KL={meas:['Measured data','k-meas'],model:['Model output',''],est:['Reported estimate','k-est'],int:['Scientific interpretation','k-int']};
+function kindTags(a){return (a&&a.length)?'<span class="kl">'+a.map(function(k){return '<span class="kind '+KL[k][1]+'">'+KL[k][0]+'</span>'}).join('')+'</span>':''}
+function ramp(cl,max){var t=Math.max(0,Math.min(1,cl/max)); return 'color-mix(in srgb, var(--ramp-hi) '+Math.round(t*100)+'%, var(--ramp-lo))'}
+
+/* map */
+function clipHalf(poly,inside,inter){
+  var out=[]; for(var i=0;i<poly.length;i++){var a=poly[i],b=poly[(i+1)%poly.length],ia=inside(a),ib=inside(b);
+    if(ia){out.push(a); if(!ib) out.push(inter(a,b))} else if(ib){out.push(inter(a,b))}} return out;
+}
+function interLat(v){return function(a,b){var t=(v-a[1])/(b[1]-a[1]); return [a[0]+t*(b[0]-a[0]),v]}}
+function renderMap(){
+  var C=DATA.chloride, poly=DATA.outline, svg=$('#mapSvg');
+  var lat0=31.41, kx=Math.cos(lat0*Math.PI/180), W=320, H=420, pad=16;
+  var lons=poly.map(function(p){return p[0]}), lats=poly.map(function(p){return p[1]});
+  var lonMin=Math.min.apply(null,lons), lonMax=Math.max.apply(null,lons), latMin=Math.min.apply(null,lats), latMax=Math.max.apply(null,lats);
+  var sc=Math.min((W-2*pad)/((lonMax-lonMin)*kx),(H-2*pad)/(latMax-latMin));
+  var ox=pad+((W-2*pad)-(lonMax-lonMin)*kx*sc)/2;
+  function pr(p){return [ox+(p[0]-lonMin)*kx*sc, pad+(latMax-p[1])*sc]}
+  var html='<text class="map-txt" x="'+pad+'" y="'+(pad+150)+'">Mediterranean</text><text class="map-txt" x="'+pad+'" y="'+(pad+166)+'">Sea</text>';
+  html+='<text class="map-txt" x="'+(W-8)+'" y="'+(pad+250)+'" text-anchor="end">Israel</text><text class="map-txt" x="'+(ox+4)+'" y="'+(H-10)+'">Egypt</text>';
+  var cent={};
+  C.regions.forEach(function(r){
+    var p=clipHalf(poly,function(q){return q[1]>=r.lat[0]},interLat(r.lat[0]));
+    p=clipHalf(p,function(q){return q[1]<=r.lat[1]},interLat(r.lat[1]));
+    var pp=p.map(pr), d='M'+pp.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' L')+' Z';
+    var cx=pp.reduce(function(a,q){return a+q[0]},0)/pp.length, cy=pp.reduce(function(a,q){return a+q[1]},0)/pp.length; cent[r.id]=[cx,cy];
+    html+='<path class="region" data-id="'+esc(r.id)+'" d="'+d+'" tabindex="0" role="button" aria-pressed="false" aria-label="'+esc(r.name)+', average chloride '+nf.format(r.cl)+' milligrams per litre" style="fill:'+ramp(r.cl,C.max)+'"><title>'+esc(r.name)+': '+nf.format(r.cl)+' mg/L</title></path>';
+  });
+  html+='<text class="map-sel" id="mapSel" text-anchor="middle"></text>';
+  svg.innerHTML=html;
+  var rows=$('#clRows'); rows.innerHTML=C.regions.map(function(r){
+    return '<button type="button" class="row" data-id="'+esc(r.id)+'" aria-pressed="false"><span class="rn">'+esc(r.name)+'</span><span class="rv">'+nf.format(r.cl)+'</span><span class="track"><span class="fill" style="width:'+(r.cl/C.max*100)+'%;background:'+ramp(r.cl,C.max)+'"></span><span class="mark" style="left:'+(C.threshold/C.max*100)+'%"></span></span></button>';
+  }).join('');
+  $('#clSource').textContent='Source: '+C.source+'.';
+  function sel(id){
+    $$('.row',rows).forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-id')===id?'true':'false')});
+    $$('.region',svg).forEach(function(p){var on=p.getAttribute('data-id')===id; p.classList.toggle('on',on); p.setAttribute('aria-pressed',on?'true':'false')});
+    var r=C.regions.filter(function(q){return q.id===id})[0], c=cent[id], t=$('#mapSel');
+    t.textContent=r.name; t.setAttribute('x',c[0]); t.setAttribute('y',c[1]); t.setAttribute('aria-hidden','true');
+    var ratio=r.cl/C.threshold;
+    $('#clDetail').innerHTML='<strong>'+esc(r.name)+'.</strong> Average of domestic water and generated wastewater, '+esc(C.period)+': <span class="tnum">'+nf.format(r.cl)+' mg/L</span>, about <span class="tnum">'+f1(ratio)+'</span> times the 250 mg/L taste reference.';
+    var path=$('.region[data-id="'+id+'"]',svg), old=$('#regionOn',svg); if(old) old.remove(); var ov=document.createElementNS('http://www.w3.org/2000/svg','path'); ov.setAttribute('id','regionOn'); ov.setAttribute('class','region-on'); ov.setAttribute('d',path.getAttribute('d')); svg.appendChild(ov); svg.appendChild(t);
+  }
+  $$('.row',rows).forEach(function(b){b.addEventListener('click',function(){sel(b.getAttribute('data-id'))})});
+  $$('.region',svg).forEach(function(p,ix,all){
+    p.addEventListener('click',function(){sel(p.getAttribute('data-id'))});
+    p.addEventListener('keydown',function(e){
+      var k=e.key;
+      if(k==='Enter'||k===' '){e.preventDefault(); sel(p.getAttribute('data-id'))}
+      else if(k==='ArrowDown'||k==='ArrowRight'||k==='ArrowUp'||k==='ArrowLeft'){e.preventDefault(); var n=all[(ix+((k==='ArrowDown'||k==='ArrowRight')?1:all.length-1))%all.length]; n.focus(); sel(n.getAttribute('data-id'))}
+    });
+  });
+  sel('gaza');
+}
+
+/* balance */
+function renderBalance(){
+  var B=DATA.balance, seg=$('#balSeg'), cur=B[1], MAX=220;
+  seg.innerHTML=B.map(function(b){return '<button type="button" data-id="'+b.id+'" aria-pressed="'+(b===cur)+'">'+esc(b.label)+'</button>'}).join('');
+  function rng(a){return a[0]===a[1]?'about '+a[0]:a[0]+' to '+a[1]}
+  function bar(label,cls,a){
+    var lo=a[0]/MAX*100, hi=(a[1]-a[0])/MAX*100;
+    return '<div class="bar-row"><div class="bl"><span>'+label+'</span><span>'+rng(a)+' MCM/yr</span></div><div class="band"><div class="solid '+cls+'" style="left:0;width:'+lo+'%"></div>'+(hi>0?'<div class="range '+cls+'" style="left:'+lo+'%;width:'+hi+'%"></div>':'')+'</div></div>';
+  }
+  function draw(){
+    var lo=cur.abstraction[0]/cur.recharge[1], hi=cur.abstraction[1]/cur.recharge[0];
+    $('#balBars').innerHTML=bar(esc(cur.measure),'c-fresh',cur.recharge)+bar('Abstraction','c-pump',cur.abstraction)+'<p><strong class="tnum">'+(Math.abs(hi-lo)<0.15?'About '+f1((lo+hi)/2):f1(lo)+' to '+f1(hi))+' times</strong> the figure in the top bar ('+esc(cur.measure.toLowerCase())+').</p>';
+    $('#balNote').textContent=cur.note;
+    $$('button',seg).forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-id')===cur.id?'true':'false')});
+  }
+  $$('button',seg).forEach(function(b){b.addEventListener('click',function(){cur=B.filter(function(x){return x.id===b.getAttribute('data-id')})[0]; draw()})});
+  draw();
+  var cut=$('#cut'), A0=180, R=57.5;
+  function cutDraw(){
+    var c=+cut.value, a=A0*(1-c/100), diff=a-R;
+    $('#cutOut').textContent=c+'%';
+    function b2(label,cls,v){return '<div class="bar-row"><div class="bl"><span>'+label+'</span><span>'+f1(v)+' MCM/yr</span></div><div class="band cap"><div class="solid '+cls+'" style="left:0;width:'+(v/MAX*100)+'%"></div><div class="tick" style="left:'+(R/MAX*100)+'%"></div></div></div>'}
+    $('#cutBars').innerHTML=b2('Abstraction','c-pump',a)+'<p class="small">The dark line marks the safe yield at 57.5 MCM/yr.</p>';
+    $('#cutText').innerHTML=diff>0.5?'Pumping still exceeds the safe yield by <strong class="tnum">'+f1(diff)+' MCM/yr</strong>. Balance needs a cut of about 68%.':'Pumping is <strong class="tnum">'+f1(Math.abs(diff))+' MCM/yr</strong> below the safe yield. This is the cut that balances the numbers, not one that restores the aquifer.';
+  }
+  cut.addEventListener('input',cutDraw); cutDraw();
+}
+
+/* salt */
+function renderSalt(){
+  var S=DATA.salt, seg=$('#saltSeg'), fig=$('#saltFig'), cur=null;
+  seg.innerHTML='<button type="button" data-id="all" aria-pressed="true">All four</button>'+S.map(function(s){return '<button type="button" data-id="'+s.id+'" aria-pressed="false">'+esc(s.name)+'</button>'}).join('');
+  function draw(){
+    if(cur){fig.setAttribute('data-sel',cur.id)} else fig.removeAttribute('data-sel');
+    $$('button',seg).forEach(function(b){var id=b.getAttribute('data-id'); b.setAttribute('aria-pressed',(cur?cur.id:'all')===id?'true':'false')});
+    var c=$('#saltCard');
+    if(!cur){c.innerHTML='<p>Select a source to read what the evidence says about it. They are drawn together here because no study ranks them quantitatively, and the fourth is a contamination pathway rather than a quantified salinity source.</p>'; return}
+    c.innerHTML='<dl><div><dt>Source</dt><dd><strong>'+esc(cur.name)+'</strong></dd></div><div><dt>Type</dt><dd>'+esc(cur.type)+'</dd></div><div><dt>Where</dt><dd>'+esc(cur.where)+'</dd></div><div><dt>Evidence</dt><dd>'+kindTags(cur.kinds)+' '+esc(cur.evidence)+'</dd></div><div><dt>Status</dt><dd>'+esc(cur.status)+'</dd></div></dl>';
+  }
+  $$('button',seg).forEach(function(b){b.addEventListener('click',function(){var id=b.getAttribute('data-id'); cur=id==='all'?null:S.filter(function(x){return x.id===id})[0]; draw()})});
+  draw();
+}
+
+/* unfit */
+function renderUnfit(){
+  var U=DATA.unfit, T=DATA.tiers, mode='failing', seg=$('#unfitSeg'), list=$('#unfitList');
+  function draw(){
+    var html='', group='';
+    U.forEach(function(u){
+      if(u.group!==group){group=u.group; html+='<h3 class="group-title">'+esc(group)+'</h3>'+(u.groupNote?'<p class="group-note">'+esc(u.groupNote)+'</p>':'')}
+      var v=mode==='failing'?u.failing:Math.round((100-u.failing)*10)/10;
+      html+='<div class="urow"><div><div class="what">'+esc(u.label)+'</div></div><div class="track" role="img" aria-label="'+f1(v)+' percent"><div class="fill" style="width:'+v+'%;background:'+(mode==='failing'?'var(--accent)':'var(--fresh)')+'"></div></div><div class="uv">'+f1(v)+'%</div><div class="meta">'+kindTags(u.kinds)+' '+esc(u.measure)+'. <span class="tag t-'+esc(u.tier)+'">'+esc(T[u.tier])+'</span>, '+esc(u.source)+'.</div></div>';
+    });
+    list.innerHTML=html;
+    $$('button',seg).forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===mode?'true':'false')});
+  }
+  $$('button',seg).forEach(function(b){b.addEventListener('click',function(){mode=b.getAttribute('data-mode'); draw()})});
+  $('#tierKey').textContent='Each row shows the share above or below the threshold stated in its source, for the sample type in its group. Single-parameter rows do not describe water quality overall. The 0.9% figure counts household tap samples, not wells or aquifer water.';
+  draw();
+}
+
+/* war log */
+function renderWar(){
+  var W=DATA.war, T=DATA.tiers, seg=$('#warSeg'), log=$('#warLog'), tiers=['un','ngo','local'], cur='all';
+  function count(t){return W.filter(function(w){return t==='all'||w.tier===t}).length}
+  seg.innerHTML=['all'].concat(tiers).map(function(t){return '<button type="button" data-t="'+t+'" aria-pressed="'+(t===cur)+'">'+(t==='all'?'All':T[t])+' ('+count(t)+')</button>'}).join('');
+  function draw(){
+    log.innerHTML=W.filter(function(w){return cur==='all'||w.tier===cur}).map(function(w){
+      return '<article class="log-item"><div class="log-date">'+esc(w.dateLabel)+'</div><div><div class="log-meta"><strong>'+esc(w.org)+'</strong><span class="tag t-'+esc(w.tier)+'">'+esc(T[w.tier])+'</span>'+kindTags(w.kinds)+'</div><p>'+esc(w.text)+'</p><p class="src"><a href="'+safeUrl(w.url)+'" target="_blank" rel="noopener">Source'+EXT+'</a></p></div></article>';
+    }).join('');
+    $$('button',seg).forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-t')===cur?'true':'false')});
+  }
+  $$('button',seg).forEach(function(b){b.addEventListener('click',function(){cur=b.getAttribute('data-t'); draw()})});
+  draw();
+}
+
+/* quiz */
+function renderQuiz(){
+  var Q=DATA.quiz, box=$('#quizBox'), i=0, score=0;
+  function ask(){
+    var q=Q[i], answered=false;
+    box.innerHTML='<div class="progress"><span>Question '+(i+1)+' of '+Q.length+'</span><span>'+score+' correct</span></div><h3 id="qh">'+esc(q.q)+'</h3><div class="stack" id="opts" role="group" aria-labelledby="qh">'+q.options.map(function(o,k){return '<button type="button" class="opt" data-k="'+k+'"><span>'+esc(o)+'</span></button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>';
+    $$('.opt',box).forEach(function(b){b.addEventListener('click',function(){
+      if(answered) return; answered=true;
+      var k=+b.getAttribute('data-k'), ok=k===q.answer; if(ok) score++;
+      $$('.opt',box).forEach(function(o){o.disabled=true; var ok2=+o.getAttribute('data-k')===q.answer;
+        if(ok2){o.classList.add('right'); o.insertAdjacentHTML('afterbegin',CHECK)}
+        else if(o===b){o.classList.add('wrong'); o.insertAdjacentHTML('afterbegin',CROSS)}});
+      $('#fb').innerHTML='<div class="stack"><p><span class="verdict">'+(ok?'Correct.':'Not quite.')+'</span> '+esc(q.why)+'</p><div><button type="button" class="btn quiet" id="next">'+(i===Q.length-1?'See result':'Next question')+'</button></div></div>';
+      $('#next').focus();
+      $('#next').addEventListener('click',function(){i++; if(i<Q.length) ask(); else done()});
+    })});
+  }
+  function done(){
+    box.innerHTML='<div class="progress"><span>Finished</span></div><p class="stat">'+score+' of '+Q.length+'</p><p>'+(score===Q.length?'Every answer matches the evidence in the research.':'Review the sections above for the ones you missed.')+'</p><div><button type="button" class="btn" id="again">Start again</button></div>';
+    $('#again').addEventListener('click',function(){i=0; score=0; ask()});
+  }
+  ask();
+}
+
+load();
+})();
+</script>
+
+</body>
+</html>
