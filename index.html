@@ -235,6 +235,35 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
 .kinds{display:grid; gap:var(--s3) var(--s5); grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin:var(--s4) 0 0}
 .kinds div{display:grid; gap:var(--s1); justify-items:start}
 .kinds dd{margin:0; font-size:15px; color:var(--fg-muted)}
+.k-course{background:var(--surface-2)}
+.k-rec{border-style:double; border-width:4px; line-height:1.2}
+.tbl{width:100%; min-width:560px; border-collapse:collapse; font-size:16px}
+.tbl th,.tbl td{text-align:left; vertical-align:top; padding:var(--s3) var(--s4); border-bottom:1px solid var(--line)}
+.tbl thead th{font-family:var(--font-head); font-size:15px; color:var(--fg-muted)}
+.tbl tbody th{font-family:var(--font-head); color:var(--fg)}
+.tbl.stk{min-width:0}
+.judg{border:2px dotted var(--fg); border-radius:calc(var(--r-frame) - var(--pad-frame)); overflow:hidden}
+@media (max-width:700px){
+.tbl.stk thead{position:absolute; left:-9999px}
+.tbl.stk caption{display:block; width:100%}
+.tbl.stk,.tbl.stk tbody,.tbl.stk tr,.tbl.stk th,.tbl.stk td{display:block}
+.tbl.stk tr{padding:var(--s3) 0; border-bottom:1px solid var(--line)}
+.tbl.stk th,.tbl.stk td{border:0; padding:var(--s1) var(--s4)}
+.tbl.stk td::before{content:attr(data-label); display:block; font-size:14px; font-weight:700; color:var(--fg-muted)}
+}
+.bul{margin:0; padding-left:1.2em; display:grid; gap:var(--s2)}
+.bul.tight{gap:var(--s1)}
+.dpsir{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s3)}
+.dp{display:grid; grid-template-columns:112px minmax(0,1fr); background:var(--surface); border:1px solid var(--line); border-radius:var(--r-frame); padding:var(--pad-frame)}
+.dp-key{display:flex; align-items:center; justify-content:center; border-radius:calc(var(--r-frame) - var(--pad-frame)); font-family:var(--font-head); font-weight:800; font-size:52px; line-height:1; padding:var(--s4)}
+.dp-D{background:var(--sand); color:var(--fg)} .dp-P{background:var(--clay); color:var(--on-clay)} .dp-S{background:var(--salt); color:var(--on-salt)} .dp-I{background:var(--surface-2); color:var(--fg)} .dp-R{background:var(--fresh); color:var(--on-fresh)}
+.dp-body{padding:var(--s4) var(--s5); display:flex; flex-direction:column; gap:var(--s4)}
+.dp-cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:var(--s4) var(--s5)}
+.dp-cols h4{margin:0 0 var(--s2); font-family:var(--font-head); font-size:15px; color:var(--fg-muted)}
+.dp-arrow{display:flex; align-items:center; justify-content:center; gap:var(--s2); color:var(--fg-muted); font-size:15px; font-weight:600}
+@media (max-width:700px){.dp{grid-template-columns:1fr}.dp-key{justify-content:flex-start; font-size:36px; padding:var(--s2) var(--s4)}.dp-body{padding:var(--s4) var(--s3)}}
+.eia{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s6)}
+
 .kl{display:inline-flex; flex-wrap:wrap; gap:var(--s1) var(--s2)}
 .map-title{font-size:17px; margin:0 0 var(--s3); max-width:30ch}
 .group-note{font-size:15px; color:var(--fg-muted); margin:0 0 var(--s2)}
@@ -252,10 +281,14 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
   <nav aria-label="Sections">
     <a href="#rule">The 1:40 rule</a>
     <a href="#gaza">Gaza</a>
+    <a href="#system">System</a>
+    <a href="#indicators">Indicators</a>
     <a href="#balance">Water balance</a>
     <a href="#salt">Sources of salt</a>
     <a href="#unfit">Unfit water</a>
     <a href="#war">Since 2023</a>
+    <a href="#dpsir">DPSIR</a>
+    <a href="#eia">EIA</a>
     <a href="#quiz">Quiz</a>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch colour theme" data-mode="light">
       <svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>
@@ -342,7 +375,7 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
   </div>
   <div class="callout" style="margin-top:var(--s3)"><p><strong>Educational simulation, not a Gaza model.</strong> It illustrates the idealised Ghyben-Herzberg relation. It is not a hydrogeological model calibrated for the Gaza Strip, and its numbers are not Gaza measurements or predictions.</p>
 <p class="small">Illustrative aquifer: 80 m thick, straight-line water table, well screen 20 to 30 m below sea level, vertical scale exaggerated about 9 times. The drawdown cone is assumed to spread about 600 m either side of the well. Dashed lines show the baseline without drawdown. The wedge toe is where the interface meets the aquifer base, counted from the shore, and it moves with both sliders. A cone at the well can draw up a separate pocket of salt water that is not part of the wedge.</p></div>
-<dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>Sampled or surveyed values.</dd></div><div><dt><span class="kind">Model output</span></dt><dd>Values computed by a model.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures relayed from studies, agencies or NGOs.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>An author's reading of the data.</dd></div></dl>
+<dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>Sampled or surveyed values.</dd></div><div><dt><span class="kind">Model output</span></dt><dd>Values computed by a model.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures relayed from studies, agencies or NGOs.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>An author's reading of the data.</dd></div><div><dt><span class="kind k-course">Course concept</span></dt><dd>Definition from the course materials or the cited framework.</dd></div><div><dt><span class="kind k-rec">Proposed measure</span></dt><dd>A recommendation, not an existing policy.</dd></div></dl>
 </section>
 
 <section class="block" id="rule">
@@ -410,6 +443,153 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
       <p class="stat">78%</p>
       <p><span class="kind k-meas">Measured data</span> Share of wells within 2 km of the shore with elevated chloride in a 2000 survey of 101 wells. Coastal values exceed 2,000 mg/L and reach more than 10,000 mg/L at some spots.</p>
     </div>
+  </div>
+</section>
+
+<section class="block" id="system">
+  <div class="block-head">
+    <h2>The Gaza Coastal Aquifer as an Environmental System</h2>
+    <p class="lead"><span class="kind k-course">Course concept</span> "A system is a set of interacting or interdependent components forming an integrated whole." Seen this way, the aquifer is not a block of rock with water in it. Geology, water, people and the environment act on one another, and a change in one shows up in the others.</p>
+  </div>
+  <div class="frame">
+    <div class="inner">
+      <div class="figscroll narrow" role="region" aria-label="Environmental system diagram" tabindex="0">
+      <svg class="fig" viewBox="0 0 640 420" role="img" aria-labelledby="sysT sysD">
+        <title id="sysT">Gaza Coastal Aquifer as an environmental system</title>
+        <desc id="sysD">Four components inside a dashed system boundary: physical and geological, hydrological, human, and environmental. External influences act on the boundary from above. Numbered arrows: 1 physical to hydrological, 2 human to hydrological, 3 hydrological to environmental, 4 environmental back to human, 5 human to environmental. The numbered list below the diagram explains each arrow.</desc>
+        <defs><marker id="sysArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="var(--fg)"/></marker></defs>
+        <rect width="640" height="420" fill="var(--surface)"/>
+        <rect x="20" y="6" width="600" height="66" rx="8" fill="var(--surface-2)" stroke="var(--line)"/>
+        <text x="320" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">External influences</text>
+        <text x="320" y="44" text-anchor="middle" font-size="13.5" fill="var(--fg)">Rainfall variability, climate conditions, sea-level change,</text>
+        <text x="320" y="61" text-anchor="middle" font-size="13.5" fill="var(--fg)">population pressure, regional water management</text>
+        <path d="M320 74 V98" stroke="var(--fg)" stroke-width="2.5" marker-end="url(#sysArr)" fill="none"/>
+        <rect x="14" y="102" width="612" height="304" rx="14" fill="none" stroke="var(--fg-muted)" stroke-width="2" stroke-dasharray="8 6"/>
+        <text x="30" y="122" font-size="13.5" font-weight="700" fill="var(--fg-muted)">System boundary: Gaza Coastal Aquifer and its surrounding coastal environment</text>
+        <g>
+          <rect x="34" y="134" width="262" height="104" rx="10" fill="var(--sand)"/>
+          <text x="48" y="160" font-size="16" font-weight="700" fill="var(--fg)">Physical and geological</text>
+          <text x="48" y="182" font-size="13.5" fill="var(--fg)">Kurkar sandstone and dune sand,</text>
+          <text x="48" y="200" font-size="13.5" fill="var(--fg)">Saqiye clays, coastal boundary,</text>
+          <text x="48" y="218" font-size="13.5" fill="var(--fg)">aquifer thickness and geometry</text>
+        </g>
+        <g>
+          <rect x="344" y="134" width="262" height="104" rx="10" fill="var(--fresh)"/>
+          <text x="358" y="160" font-size="16" font-weight="700" fill="var(--on-fresh)">Hydrological</text>
+          <text x="358" y="182" font-size="13.5" fill="var(--on-fresh)">Storage, rainfall recharge, abstraction,</text>
+          <text x="358" y="200" font-size="13.5" fill="var(--on-fresh)">heads and gradients, the fresh and</text>
+          <text x="358" y="218" font-size="13.5" fill="var(--on-fresh)">salt water interface</text>
+        </g>
+        <g>
+          <rect x="34" y="288" width="262" height="104" rx="10" fill="var(--surface-2)" stroke="var(--fg)" stroke-width="1.5"/>
+          <text x="48" y="314" font-size="16" font-weight="700" fill="var(--fg)">Human</text>
+          <text x="48" y="336" font-size="13.5" fill="var(--fg)">Population, domestic, farm and</text>
+          <text x="48" y="354" font-size="13.5" fill="var(--fg)">industrial demand, wells and</text>
+          <text x="48" y="372" font-size="13.5" fill="var(--fg)">water infrastructure</text>
+        </g>
+        <g>
+          <rect x="344" y="288" width="262" height="104" rx="10" fill="var(--surface)" stroke="var(--fg)" stroke-width="1.5"/>
+          <text x="358" y="314" font-size="16" font-weight="700" fill="var(--fg)">Environmental</text>
+          <text x="358" y="336" font-size="13.5" fill="var(--fg)">Groundwater quality, soil salinity,</text>
+          <text x="358" y="354" font-size="13.5" fill="var(--fg)">crop productivity, coastal ecosystems,</text>
+          <text x="358" y="372" font-size="13.5" fill="var(--fg)">health and water access</text>
+        </g>
+        <g stroke="var(--fg)" stroke-width="2.5" fill="none">
+          <path d="M297 186 H341" marker-end="url(#sysArr)"/>
+          <path d="M297 300 L362 242" marker-end="url(#sysArr)"/>
+          <path d="M475 240 V285" marker-end="url(#sysArr)"/>
+          <path d="M342 340 H299" marker-end="url(#sysArr)"/>
+          <path d="M299 368 H342" marker-end="url(#sysArr)"/>
+        </g>
+        <g font-size="12.5" font-weight="700" text-anchor="middle">
+          <circle cx="319" cy="168" r="11" fill="var(--fg)"/><text x="319" y="172.5" fill="var(--bg)">1</text>
+          <circle cx="322" cy="254" r="11" fill="var(--fg)"/><text x="322" y="258.5" fill="var(--bg)">2</text>
+          <circle cx="498" cy="262" r="11" fill="var(--fg)"/><text x="498" y="266.5" fill="var(--bg)">3</text>
+          <circle cx="321" cy="322" r="11" fill="var(--fg)"/><text x="321" y="326.5" fill="var(--bg)">4</text>
+          <circle cx="321" cy="387" r="11" fill="var(--fg)"/><text x="321" y="391.5" fill="var(--bg)">5</text>
+        </g>
+      </svg>
+      </div>
+    </div>
+  </div>
+  <p class="small" style="max-width:70ch">Conceptual model prepared for this page <span class="kind k-int">Scientific interpretation</span>. It simplifies the system and is not a published diagram.</p>
+  <ol class="bul" style="max-width:75ch">
+    <li><strong>Physical to hydrological.</strong> Sand and sandstone store and transmit water, and clay layers slow vertical flow, so geometry controls storage, flow and where fresh and salt water meet.</li>
+    <li><strong>Human to hydrological.</strong> Pumping lowers the freshwater head. Under the 1:40 relation, a lower head lets the saltwater interface rise.</li>
+    <li><strong>Hydrological to environmental.</strong> Lower heads allow saline water to move inland, which changes groundwater quality and, through irrigation, soils.</li>
+    <li><strong>Environmental back to human.</strong> Poorer groundwater quality reduces usable supply, which pushes people toward other water sources and changes irrigation choices. This is a feedback loop.</li>
+    <li><strong>Human to environmental.</strong> Sewage and fertiliser are a separate contamination pathway, mainly nitrate. This page does not assign them a share of groundwater salinity.</li>
+  </ol>
+  <div class="cols even">
+    <dl class="facts" style="grid-template-columns:1fr">
+      <div><dt>Physical and geological</dt><dd>Kurkar sandstone and dune sand over Saqiye Group clays; coastal boundary to the Mediterranean in the west; flow and freshwater-seawater interaction (see the Gaza section above).</dd></div>
+      <div><dt>Hydrological</dt><dd>Storage, recharge from rainfall, abstraction, groundwater levels and hydraulic gradients, and the freshwater-seawater interface.</dd></div>
+      <div><dt>Human</dt><dd>Population growth, domestic demand, irrigation, industrial use, pumping and water infrastructure.</dd></div>
+      <div><dt>Environmental</dt><dd>Groundwater quality, soil salinity, agricultural productivity, coastal ecosystems, human health and water availability. The sources reviewed do not quantify soil salinity or ecosystem effects for Gaza.</dd></div>
+    </dl>
+    <div class="stack">
+      <h3>System boundaries</h3>
+      <ul class="bul">
+        <li><strong>Spatial:</strong> the Gaza Coastal Aquifer and its surrounding coastal environment.</li>
+        <li><strong>Temporal:</strong> historical change in groundwater salinity, and the more recent deterioration, including the period since October 2023.</li>
+        <li><strong>External influences:</strong> rainfall variability, climate conditions, sea-level change, population pressure and regional water management. They act on the system but are not set by it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="indicators">
+  <div class="block-head">
+    <h2>Environmental Indicators and System Monitoring</h2>
+    <p class="lead"><span class="kind k-course">Course concept</span> Environmental indicators give information about changes in the components of an environmental system and support decisions about it. Factors describe the natural setting and the human pressures. Indicators are the measurable variables used to track change. An indicator reports a condition and does not by itself name the process that caused it.</p>
+  </div>
+  <div class="stack">
+    <h3>A. Environmental factors and system characteristics</h3>
+    <div class="cols even">
+      <div class="stack">
+        <h3>Natural factors</h3>
+        <ul class="bul">
+          <li>Rainfall and recharge conditions. Weinthal et al. (2005) use 35 MCM/yr of natural recharge in their water balance.</li>
+          <li>Coastal aquifer characteristics.</li>
+          <li>Geological formations and aquifer structure: Kurkar sandstone and dune sand over Saqiye clays.</li>
+          <li>Natural saline groundwater inflow, where the studies support it: brackish Eocene-derived water from the east (see Sources of salt).</li>
+          <li>Sea-level conditions.</li>
+        </ul>
+      </div>
+      <div class="stack">
+        <h3>Anthropogenic factors</h3>
+        <ul class="bul">
+          <li>Groundwater abstraction and pumping.</li>
+          <li>Agricultural water demand.</li>
+          <li>Urbanisation and land-use changes.</li>
+          <li>Wastewater discharge.</li>
+          <li>Fertiliser use and other human-related contamination sources. These are a nitrate pathway with no quantified salinity share.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="stack">
+    <h3>B. Measurable environmental indicators</h3>
+    <div class="frame"><div class="inner">
+      <table class="tbl stk">
+        <caption class="small" style="text-align:left; padding:var(--s3) var(--s4)">Variables that can be measured. Whether Gaza data exist, and what they show, is stated in the last column.</caption>
+        <thead><tr><th scope="col">Indicator</th><th scope="col">What is measured and its unit</th><th scope="col">What it helps assess</th><th scope="col">Why it matters in Gaza</th></tr></thead>
+        <tbody><tr><th scope="row">Groundwater level</th><td data-label="What is measured and its unit">Water-table or head elevation, in metres (m)</td><td data-label="What it helps assess">Changes in hydraulic conditions and groundwater depletion</td><td data-label="Why it matters in Gaza">Head sets how high the saltwater interface sits (1:40 relation). Heads reported several to more than 15 m below sea level <span class="kind k-est">Reported estimate</span>.</td></tr><tr><th scope="row">Chloride concentration</th><td data-label="What is measured and its unit">Dissolved chloride, in mg/L</td><td data-label="What it helps assess">Groundwater salinity and possible seawater intrusion</td><td data-label="Why it matters in Gaza">Mapped as mean chloride in domestic water and wastewater, 2009 to 2019 <span class="kind k-est">Reported estimate</span>. High chloride does not by itself show seawater intrusion, because eastern brackish inflow and deep brine also add salt.</td></tr><tr><th scope="row">Electrical conductivity (EC)</th><td data-label="What is measured and its unit">Ability of water to conduct current, in µS/cm</td><td data-label="What it helps assess">Overall dissolved-ion content</td><td data-label="Why it matters in Gaza">Supports salinity monitoring. Not charted on this page for Gaza.</td></tr><tr><th scope="row">Total dissolved solids (TDS)</th><td data-label="What is measured and its unit">Dissolved solids, in mg/L</td><td data-label="What it helps assess">General groundwater mineralisation</td><td data-label="Why it matters in Gaza">Shows total salts, which chloride alone can miss. Not charted on this page for Gaza.</td></tr><tr><th scope="row">Groundwater abstraction rate</th><td data-label="What is measured and its unit">Volume pumped per year, in MCM/year</td><td data-label="What it helps assess">Human pressure on groundwater resources</td><td data-label="Why it matters in Gaza">Reported as 160 to 200 MCM/yr (UNEP 2020) <span class="kind k-est">Reported estimate</span>.</td></tr><tr><th scope="row">Groundwater recharge rate</th><td data-label="What is measured and its unit">Volume entering the aquifer per year, in MCM/year</td><td data-label="What it helps assess">Water replenishment</td><td data-label="Why it matters in Gaza">Reported figures differ in what they measure; Weinthal et al. (2005) use 35 MCM/yr of natural recharge <span class="kind k-est">Reported estimate</span>. See Water balance.</td></tr><tr><th scope="row">Nitrate concentration</th><td data-label="What is measured and its unit">Dissolved nitrate, in mg/L</td><td data-label="What it helps assess">Possible contamination from wastewater and agricultural sources</td><td data-label="Why it matters in Gaza">Indicates a contamination pathway that is separate from salinity and is not equivalent to chloride. Not charted on this page, and no salinity share is assigned to it.</td></tr><tr><th scope="row">Seawater-freshwater interface position</th><td data-label="What is measured and its unit">Distance inland, or depth, of the saline interface</td><td data-label="What it helps assess">Changes in the location of the saline interface</td><td data-label="Why it matters in Gaza">Inferred from wells and models rather than observed directly. The 41.72 km² intruded area for 2019 is a modelled value <span class="kind">Model output</span>.</td></tr></tbody>
+      </table>
+    </div></div>
+  </div>
+  <div class="stack" style="max-width:70ch">
+    <h3>Factor, pressure and indicator are different things <span class="kind k-int">Scientific interpretation</span></h3>
+    <ul class="bul">
+      <li>Geological formations and aquifer thickness are system characteristics, not monitoring indicators.</li>
+      <li>Pumping is a human pressure. The abstraction rate is the measurable indicator of that pressure.</li>
+      <li>Wastewater discharge is a pressure. Nitrate concentration can indicate its potential impact.</li>
+      <li>Chloride is an indicator of salinity. Elevated chloride alone does not prove that seawater intrusion is the only salinity source: eastern brackish inflow, deep brine and wastewater-related contamination remain separate pathways.</li>
+    </ul>
+  </div>
+  <div class="stack" style="max-width:70ch">
+    <h3>Why one indicator is not enough <span class="kind k-int">Scientific interpretation</span></h3>
+    <p>Chloride that rises while heads fall points toward pumping-driven saline-water movement, but the same chloride rise could come from eastern brackish inflow or deep brine, so level data and chloride have to be read together. TDS and EC show total salts and ionic content, so they can reveal salinity that chloride alone would miss. Abstraction and recharge show whether the pressure is sustainable. An indicator is a symptom; the process behind it has to be inferred from several indicators and from the hydrogeological setting.</p>
   </div>
 </section>
 
@@ -550,7 +730,7 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
     <strong>What is missing.</strong> No publicly documented post-October 2023 groundwater quality survey was identified in the sources reviewed. The only groundwater observation found is MSF's report on two hospital boreholes in October 2025, which covers one site and was not independently verified here. UNEP calls aquifer contamination likely, with its extent unknown. In the near term, sewage and cesspit leakage probably matters more than seawater intrusion, which is slower. That is a scientific interpretation, not a measurement.
     <br><span class="small">Sources last reviewed: 16 November 2026. The newest dated source is 15 October 2026.</span>
   </div>
-  <dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>A sample result reported from the field.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures from agencies or NGOs, often relayed from partners.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>A judgment such as "likely", not a measured result.</dd></div></dl>
+  <dl class="kinds"><div><dt><span class="kind k-meas">Measured data</span></dt><dd>A sample result reported from the field.</dd></div><div><dt><span class="kind k-est">Reported estimate</span></dt><dd>Figures from agencies or NGOs, often relayed from partners.</dd></div><div><dt><span class="kind k-int">Scientific interpretation</span></dt><dd>A judgment such as "likely", not a measured result.</dd></div><div><dt><span class="kind k-course">Course concept</span></dt><dd>Definition from the course materials or the cited framework.</dd></div><div><dt><span class="kind k-rec">Proposed measure</span></dt><dd>A recommendation, not an existing policy.</dd></div></dl>
   <div class="slot" id="slotWar" data-state="loading">
     <div class="sk"><span style="width:50%"></span><span class="tall"></span></div>
     <div class="ok stack">
@@ -560,6 +740,142 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
     <div class="err"><p>The timeline did not load.</p><button class="btn quiet" type="button" data-retry>Try again</button></div>
   </div>
   <p class="small">Reduced pumping from damage and fuel shortages is not recovery. A 2019 laboratory and numerical study shows seawater can advance after pumping stops, and a 2012 UN-linked outlook put recovery at decades.</p>
+</section>
+
+<section class="block" id="dpsir">
+  <div class="block-head">
+    <h2>Applying the DPSIR Framework to Seawater Intrusion in Gaza</h2>
+    <p class="lead"><span class="kind k-course">Course concept</span> DPSIR links human activity to environmental change in five stages: Driving forces, Pressures, State, Impacts, Responses (after Kristensen 2004). Each stage below is applied to Gaza using only evidence already on this page.</p>
+  </div>
+  <ol class="dpsir" aria-label="DPSIR flow from Driving forces to Responses">
+    <li class="dp"><div class="dp-key dp-D" aria-hidden="true">D</div>
+      <div class="dp-body">
+        <h3>D. Driving forces</h3>
+        <p>Underlying social, demographic and economic needs that set the demand for a resource.</p>
+        <div class="dp-cols">
+          <div><h4>Gaza examples</h4><ul class="bul tight"><li>Population growth and a densely settled population.</li><li>Domestic water demand.</li><li>Agricultural production.</li><li>Industrial and economic activity.</li></ul></div>
+          <div><h4>Indicators</h4><p class="small">Population and sectoral water demand. This page does not chart them.</p></div>
+        </div>
+      </div></li>
+    <li class="dp-arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 7 6-7"/></svg>create</li>
+    <li class="dp"><div class="dp-key dp-P" aria-hidden="true">P</div>
+      <div class="dp-body">
+        <h3>P. Pressures</h3>
+        <p>What those needs do to the system. Excessive resource use and pollution are different pressures and need different responses.</p>
+        <div class="dp-cols">
+          <div><h4>Gaza examples</h4><ul class="bul tight"><li><strong>Excess use:</strong> abstraction of 160 to 200 MCM/yr against a safe yield of 55 to 60 MCM/yr (UNEP 2020) <span class="kind k-est">Reported estimate</span>. More than 5,000 wells, mostly agricultural, 40 to 70 m deep (Aquapedia, citing PWA 2014).</li><li><strong>Hydraulic effect:</strong> changed flow and a reduced freshwater head.</li><li><strong>Pollution:</strong> sewage and fertiliser, mainly nitrate. No quantified salinity share.</li></ul></div>
+          <div><h4>Indicators</h4><p class="small">Abstraction rate; recharge rate; return flows (Weinthal et al. 2005).</p></div>
+        </div>
+      </div></li>
+    <li class="dp-arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 7 6-7"/></svg>change</li>
+    <li class="dp"><div class="dp-key dp-S" aria-hidden="true">S</div>
+      <div class="dp-body">
+        <h3>S. State</h3>
+        <p>The resulting condition of the environment, described with measurable indicators.</p>
+        <div class="dp-cols">
+          <div><h4>Gaza examples</h4><ul class="bul tight"><li>Heads reported several to more than 15 m below sea level <span class="kind k-est">Reported estimate</span>.</li><li>Mean chloride in domestic water and wastewater above 250 mg/L in all five provinces, 2009 to 2019 <span class="kind k-est">Reported estimate</span>.</li><li>Interface movement: modelled intruded area of 41.72 km² in 2019 (Musallam et al. 2023) <span class="kind">Model output</span>.</li></ul></div>
+          <div><h4>Indicators</h4><p class="small">Groundwater level; chloride; interface position. Salinity has several sources, so not all of it is seawater intrusion.</p></div>
+        </div>
+      </div></li>
+    <li class="dp-arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 7 6-7"/></svg>cause</li>
+    <li class="dp"><div class="dp-key dp-I" aria-hidden="true">I</div>
+      <div class="dp-body">
+        <h3>I. Impacts</h3>
+        <p>Environmental, social and economic consequences of the changed state.</p>
+        <div class="dp-cols">
+          <div><h4>Gaza examples</h4><ul class="bul tight"><li>Less freshwater and less water fit for drinking or irrigation. Unfit shares range from 0.9% to 97% depending on sample and standard.</li><li>More reliance on alternative supplies. Reported damage to desalination plants since October 2023 (UNICEF, as relayed by MSF) <span class="kind k-est">Reported estimate</span>.</li><li>Effects on crops, ecosystems and health: not quantified in the sources reviewed, so none is stated as established here.</li></ul></div>
+          <div><h4>Indicators</h4><p class="small">Share of samples above a stated threshold (see Unfit water); water availability.</p></div>
+        </div>
+      </div></li>
+    <li class="dp-arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 7 6-7"/></svg>call for</li>
+    <li class="dp"><div class="dp-key dp-R" aria-hidden="true">R</div>
+      <div class="dp-body">
+        <h3>R. Responses</h3>
+        <p>Management and policy actions that act on the earlier stages. Responses feed back to Driving forces and Pressures.</p>
+        <div class="dp-cols">
+          <div><h4>Gaza examples</h4><h4 style="margin-top:0">Documented in the sources reviewed</h4><ul class="bul tight"><li>Desalination plants operate, with capacity badly reduced since October 2023.</li><li>Model studies (Qahman and Larabi; Selmi) simulate reduced pumping with more recharge. These are simulations, not implemented policy <span class="kind">Model output</span>.</li><li>A Palestinian Water Authority target to cut abstraction from 180 to 70 MCM/yr by 2032 appears only in a secondary source and is unverified.</li></ul><h4>Recommended practice <span class="kind k-rec">Proposed measure</span></h4><ul class="bul tight"><li>Sustainable abstraction and monitoring of levels and salinity.</li><li>Water-use efficiency and reduced leakage.</li><li>Wastewater treatment and safe reuse.</li><li>Managed aquifer recharge where technically appropriate.</li><li>Integrated coastal aquifer management.</li></ul></div>
+          <div><h4>Indicators</h4><p class="small">Change in abstraction rate; trends in levels and chloride after any measure.</p></div>
+        </div>
+      </div></li>
+  </ol>
+  <p class="small" style="max-width:70ch">DPSIR is a simplification: real causes overlap, and one pressure can have several states. The Responses stage loops back to Driving forces and Pressures.</p>
+</section>
+
+<section class="block" id="eia">
+  <div class="block-head">
+    <h2>Environmental Impact Assessment and Groundwater Management</h2>
+    <p class="lead"><span class="kind k-course">Course concept</span> "Environmental Impact Assessment (EIA) is the formal process used to predict the environmental consequences, positive or negative, of a plan, policy, program, or project before the decision to proceed." Its purpose is to protect environmental systems and natural resources by exposing consequences and mitigation before work starts.</p>
+    <div class="callout" style="max-width:70ch"><strong>Educational hypothetical.</strong> The project below is an invented teaching example. It is not an official assessment, and no such project has been shown to be implemented in Gaza.</div>
+    <p class="small"><strong>Hypothetical project:</strong> Reducing Groundwater Abstraction and Improving Groundwater Recharge in the Gaza Coastal Aquifer.</p>
+  </div>
+  <div class="cols even match">
+    <div class="stack"><h3>1. Project description</h3>
+      <ul class="bul tight"><li>Reduce excessive groundwater pumping.</li><li>Improve water-use efficiency.</li><li>Add possible recharge measures.</li><li>Monitor groundwater levels and salinity.</li></ul></div>
+    <div class="stack"><h3>2. Baseline environmental conditions</h3>
+      <ul class="bul tight"><li>Abstraction pressure: 160 to 200 MCM/yr against a safe yield of 55 to 60 MCM/yr <span class="kind k-est">Reported estimate</span>.</li><li>Heads reported several to more than 15 m below sea level <span class="kind k-est">Reported estimate</span>.</li><li>Chloride and salinity distribution: see the map and Sources of salt.</li><li>Setting: Kurkar sandstone and dune sand over Saqiye clays.</li><li>No post-war groundwater quality survey was identified, so the current baseline is unknown.</li></ul></div>
+  </div>
+  <div class="cols even match">
+    <div class="stack"><h3>3. Potential positive impacts <span class="kind k-int">Scientific interpretation</span></h3>
+      <ul class="bul tight"><li>Less pressure on the aquifer.</li><li>Better freshwater hydraulic conditions.</li><li>Possible reduction in further seawater intrusion.</li><li>Better long-term groundwater sustainability.</li></ul></div>
+    <div class="stack"><h3>4. Potential negative impacts and limitations <span class="kind k-int">Scientific interpretation</span></h3>
+      <ul class="bul tight"><li>Short-term water supply constraints.</li><li>Economic pressure on agricultural users.</li><li>Implementation and infrastructure costs.</li><li>Uncertainty about how fast groundwater quality recovers. Salinity lags can exceed 100 years in some aquifers (Werner et al. 2013).</li></ul></div>
+  </div>
+  <div class="cols even match">
+    <div class="stack"><h3>5. Mitigation measures <span class="kind k-rec">Proposed measure</span></h3>
+      <ul class="bul tight"><li>Phase in pumping restrictions gradually.</li><li>Plan alternative water supplies.</li><li>Use efficient irrigation techniques.</li><li>Monitor groundwater continuously.</li><li>Control the quality of any recharge water.</li></ul></div>
+    <div class="stack"><h3>6. Monitoring and evaluation <span class="kind k-rec">Proposed measure</span></h3>
+      <ul class="bul tight"><li>Groundwater level measurements.</li><li>Chloride and TDS monitoring.</li><li>Electrical conductivity measurements.</li><li>Changes in abstraction rates.</li><li>Periodic assessment of environmental impacts.</li></ul></div>
+  </div>
+  <div class="stack">
+    <h3>7. Analysis of alternatives <span class="kind k-int">Scientific interpretation</span></h3>
+    <p class="small" style="max-width:70ch">None of these alternatives is claimed to have been officially implemented in Gaza. They are compared for teaching.</p>
+    <dl class="facts">
+      <div><dt>Alternative 1: No action</dt><dd>Continue the current groundwater management situation. Groundwater depletion and salinity problems could continue, because the abstraction pressure and the reported heads described in the baseline would stay as they are. This is the baseline for comparison, not a recommended option.</dd></div>
+      <div><dt>Alternative 2: Reduce abstraction</dt><dd><span class="kind k-rec">Proposed measure</span> Controlled, phased cuts in pumping. Benefit: less pressure on heads and a possible slowing of further intrusion. Limits: short-term effects on water availability and on agricultural users, and quality may respond slowly.</dd></div>
+      <div><dt>Alternative 3: Integrated management</dt><dd><span class="kind k-rec">Proposed measure</span> Combines reduced abstraction, water-use efficiency, appropriate managed aquifer recharge, wastewater treatment and continuous monitoring. It acts on both excess use and pollution, so it may give broader benefits. Recharge is appropriate only where recharge-water quality and hydrogeological conditions are suitable.</dd></div>
+    </dl>
+  </div>
+  <div class="stack">
+    <h3>8. Impact significance assessment <span class="kind k-int">Scientific interpretation</span></h3>
+    <div class="callout" style="max-width:70ch"><strong>Teaching judgments.</strong> The ratings below are qualitative, not measured and not an officially approved EIA result.</div>
+    <div class="frame"><div class="inner judg">
+      <table class="tbl stk">
+        <caption class="small" style="text-align:left; padding:var(--s3) var(--s4)">Qualitative teaching judgments for the hypothetical project.</caption>
+        <thead><tr><th scope="col">Environmental impact</th><th scope="col">Expected effect</th><th scope="col">Duration</th><th scope="col">Potential significance</th><th scope="col">Mitigation or management measure</th></tr></thead>
+        <tbody><tr><th scope="row">Groundwater depletion</th><td data-label="Expected effect">Potential reduction</td><td data-label="Duration">Long-term</td><td data-label="Potential significance">High</td><td data-label="Mitigation or management measure">Sustainable abstraction limits</td></tr><tr><th scope="row">Seawater intrusion</th><td data-label="Expected effect">Potential reduction in further intrusion</td><td data-label="Duration">Long-term</td><td data-label="Potential significance">High</td><td data-label="Mitigation or management measure">Pumping management and monitoring</td></tr><tr><th scope="row">Agricultural water availability</th><td data-label="Expected effect">Possible short-term reduction</td><td data-label="Duration">Short-term</td><td data-label="Potential significance">Medium to High</td><td data-label="Mitigation or management measure">Alternative supplies and efficient irrigation</td></tr><tr><th scope="row">Groundwater quality</th><td data-label="Expected effect">Potential gradual improvement, uncertain</td><td data-label="Duration">Long-term</td><td data-label="Potential significance">High</td><td data-label="Mitigation or management measure">Water-quality monitoring and suitable recharge</td></tr><tr><th scope="row">Recharge-water contamination</th><td data-label="Expected effect">Potential negative impact if unsuitable water is used</td><td data-label="Duration">Long-term</td><td data-label="Potential significance">High</td><td data-label="Mitigation or management measure">Strict recharge-water quality controls</td></tr></tbody>
+      </table>
+    </div></div>
+  </div>
+  <div class="stack">
+    <h3>9. Stakeholder considerations <span class="kind k-int">Scientific interpretation</span></h3>
+    <p class="small" style="max-width:70ch">This is a hypothetical list. No consultation or stakeholder meeting took place.</p>
+    <dl class="facts">
+      <div><dt>Local communities and households</dt><dd>May be affected by changes in water availability and quality.</dd></div>
+      <div><dt>Farmers and agricultural water users</dt><dd>May face short-term limits on pumping and would be central to any efficient-irrigation measure.</dd></div>
+      <div><dt>Palestinian Water Authority and water-management institutions</dt><dd>Relevant to setting and enforcing abstraction limits and to monitoring.</dd></div>
+      <div><dt>Environmental and public-health organisations</dt><dd>Relevant to reviewing water-quality and environmental monitoring.</dd></div>
+      <div><dt>Water and wastewater service providers</dt><dd>Affected by supply changes, and involved in wastewater treatment and reuse.</dd></div>
+    </dl>
+  </div>
+  <div class="stack">
+    <h3>10. EIA monitoring and evaluation <span class="kind k-rec">Proposed measure</span></h3>
+    <div class="frame"><div class="inner">
+      <table class="tbl stk">
+        <caption class="small" style="text-align:left; padding:var(--s3) var(--s4)">Each proposed monitoring measure and its objective. These are proposed variables, not existing Gaza datasets.</caption>
+        <thead><tr><th scope="col">Proposed measure</th><th scope="col">Monitoring objective</th><th scope="col">What it tells us about</th></tr></thead>
+        <tbody><tr><th scope="row">Groundwater level (m)</th><td data-label="Monitoring objective">Assess hydraulic recovery</td><td data-label="What it tells us about">Hydraulic recovery</td></tr><tr><th scope="row">Chloride (mg/L) and TDS (mg/L)</th><td data-label="Monitoring objective">Assess salinity trends</td><td data-label="What it tells us about">Water-quality recovery</td></tr><tr><th scope="row">Electrical conductivity (µS/cm)</th><td data-label="Monitoring objective">Track changes in dissolved-ion content</td><td data-label="What it tells us about">Water-quality recovery</td></tr><tr><th scope="row">Nitrate (mg/L)</th><td data-label="Monitoring objective">Assess potential contamination, kept separate from salinity</td><td data-label="What it tells us about">Contamination, not salinity</td></tr><tr><th scope="row">Abstraction rate (MCM/year)</th><td data-label="Monitoring objective">Evaluate compliance with pumping targets</td><td data-label="What it tells us about">Human pressure</td></tr><tr><th scope="row">Recharge-water quality test</th><td data-label="Monitoring objective">Confirm suitability before any recharge operation</td><td data-label="What it tells us about">Precondition for recharge</td></tr></tbody>
+      </table>
+    </div></div>
+    <dl class="facts">
+      <div><dt>Hydraulic recovery</dt><dd>Improvement in groundwater levels and hydraulic conditions.</dd></div>
+      <div><dt>Water-quality recovery</dt><dd>Reduction in salinity and contaminants.</dd></div>
+    </dl>
+    <p style="max-width:70ch">Hydraulic recovery does not automatically mean water-quality recovery, and groundwater quality may respond much more slowly. No recovery date or guaranteed outcome is given here.</p>
+  </div>
+  <div class="stack" style="max-width:70ch">
+    <h3>Hydraulic recovery is not water-quality recovery <span class="kind k-int">Scientific interpretation</span></h3>
+    <p>Reducing pumping would not remove existing salinity straight away. Water levels can respond first, while salt already in the aquifer clears slowly or not at all. An assessment should therefore set separate targets and timelines for levels and for quality (see the conclusion below).</p>
+  </div>
 </section>
 
 <section class="block" id="quiz">
@@ -614,6 +930,8 @@ footer.site-foot{padding-block:var(--s7); border-top:1px solid var(--line); disp
     <li>Fanack Water. Gaza water crisis. <a href="https://water.fanack.com/publications/gaza-water-crisis/">fanack.com</a></li>
     <li>Aquapedia. Coastal Aquifer (Israel, Palestine). <a href="https://aquapedia.waterdiplomacy.org/wiki/index.php/Coastal_Aquifer_(Israel,_Palestine)">waterdiplomacy.org</a></li>
     <li>WHO. Chloride in drinking-water. <a href="https://cdn.who.int/media/docs/default-source/wash-documents/wash-chemicals/chloride-fs-new.pdf">Fact sheet</a></li>
+    <li>Kristensen, P. (2004). The DPSIR Framework. Paper for the UNEP workshop on vulnerability of water resources to environmental change in Africa, Nairobi. No link checked.</li>
+    <li>Course materials: Environmental Geology II (Env Geo 1) and Environmental Assessment, used for the definitions of a system, environmental indicators and EIA. Not publicly linked.</li>
     <li>Post-2023 reports (UNEP, OCHA, UNICEF, MSF, Al Mezan) are linked from each entry in the timeline above.</li>
   </ol>
 </section>
